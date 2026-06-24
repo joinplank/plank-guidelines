@@ -1,0 +1,415 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .tag{font-family:var(--mono);font-size:11.5px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:6px;padding:3px 10px;color:var(--gray-700);}
+
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+
+    .code-wrap{position:relative;margin-bottom:16px;}
+    .code-file{font-family:var(--mono);font-size:12px;color:var(--gray-500);margin-bottom:8px;}
+    .code{background:var(--slate);border-radius:12px;padding:20px 22px;overflow-x:auto;position:relative;}
+    .code pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8E6DE;white-space:pre;}
+    .code .cm{color:var(--gray-500);}
+    .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;transition:background .15s,color .15s;}
+    .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+    .copy-btn.copied{color:#a8d8a8;border-color:#a8d8a8;}
+
+    /* required badge */
+    .badge{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600;vertical-align:middle;margin-left:8px;}
+    .badge.required{background:#F3D9CC;color:#8A3B1E;}
+    .badge.recommended{background:#E4E9DC;color:#4B5C39;}
+
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb">
+    <a href="index.html">Plank Guidelines</a><span>›</span>Supabase
+  </div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Supabase</div>
+    <h1>Supabase Guidelines</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Platform</div><div class="v">Supabase</div></div>
+      <div class="cell"><div class="k">Database</div><div class="v">PostgreSQL</div></div>
+      <div class="cell"><div class="k">RLS</div><div class="v accent">Required</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">5</div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">PostgreSQL</span><span class="tag">RLS</span><span class="tag">Auth</span>
+      <span class="tag">Edge Functions</span><span class="tag">Realtime</span><span class="tag">Storage</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Persistence</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> API</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> RLS</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Authentication</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Edge Functions</a></li>
+      </ul>
+    </aside>
+
+    <main>
+
+      <!-- ── 01 PERSISTENCE ─────────────────────────────────────────── -->
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Persistence</h2></div>
+        <p class="sec-intro">Treat Supabase as a managed PostgreSQL host — migrations in version control, pooled connections, and typed access at every layer.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">Connection string selection</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm"># Transactional workloads (APIs, serverless) → use the pooler</span>
+DATABASE_URL=postgresql://postgres.[ref]:[pass]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true
+
+<span class="cm"># Long-lived processes (migrations, cron jobs) → direct connection</span>
+DIRECT_URL=postgresql://postgres.[ref]:[pass]@aws-0-[region].pooler.supabase.com:5432/postgres</pre>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-file">prisma/schema.prisma — dual URL setup</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")    <span class="cm">// pooler for runtime</span>
+  directUrl = env("DIRECT_URL")      <span class="cm">// direct for migrations</span>
+}</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use the <strong>Supavisor pooler</strong> (port 6543, transaction mode) for all runtime database connections — never connect directly from serverless or short-lived processes.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep a <code>DIRECT_URL</code> (port 5432) exclusively for <code>prisma migrate deploy</code> and other schema operations that require a persistent session.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">All schema changes go through migration files (<code>prisma migrate dev</code> / <code>supabase db diff</code>) committed to version control — never run raw DDL in production or use <code>db push</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Wrap multi-step writes in transactions; partial state on failure is never acceptable.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Add indexes intentionally — profile with <code>EXPLAIN ANALYZE</code> before and after; rely on the <code>supabase-postgres-best-practices</code> skill for query optimization rules.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Prefer <code>timestamptz</code> over <code>timestamp</code> for all datetime columns; store everything in UTC.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>uuid</code> primary keys (default in Supabase) — never auto-increment integers exposed in public APIs.</span></li>
+        </ul>
+      </section>
+
+      <!-- ── 02 API ──────────────────────────────────────────────────── -->
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>API</h2></div>
+        <p class="sec-intro">Supabase exposes PostgREST, Realtime, and Storage APIs. Use the typed client on the frontend; keep sensitive logic server-side or in Edge Functions.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">lib/supabase/server.ts — server-side client</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import type { Database } from '@/lib/supabase/database.types'
+
+export function createClient() {
+  const cookieStore = cookies()
+  return createServerClient&lt;Database&gt;(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll(), setAll: (c) => c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } }
+  )
+}</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Generate TypeScript types from the schema: <code>supabase gen types typescript --linked &gt; lib/supabase/database.types.ts</code> — commit and regenerate on every migration.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>@supabase/ssr</code> (not the legacy <code>auth-helpers</code>) for all Next.js / SvelteKit server-side clients; it handles cookie-based session refresh correctly.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Never expose the <code>service_role</code> key to the client or any public endpoint — it bypasses RLS entirely.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Prefer PostgREST column selection (<code>.select('id, name')</code>) over <code>.select('*')</code> — over-fetching is a security and performance risk.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use Realtime only for truly push-driven UX (notifications, presence, live scoreboards) — polling with <code>useQuery</code> is simpler and cheaper for most features.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Enable Realtime per-table in the Supabase dashboard; do not broadcast tables containing PII or sensitive data.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">For Storage: set bucket policies to private by default; create signed URLs server-side with short expiry (<code>expiresIn: 60</code>) for sensitive files.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Validate file MIME type and size server-side before writing to Storage — client-side validation is advisory only.</span></li>
+        </ul>
+      </section>
+
+      <!-- ── 03 RLS ──────────────────────────────────────────────────── -->
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Row Level Security <span class="badge required">Required</span></h2></div>
+        <p class="sec-intro">RLS is the primary data-isolation boundary in Supabase. Every table accessed by the anon or authenticated role must have RLS enabled with explicit policies — no exceptions.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">Minimum RLS setup for a user-owned table</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm">-- 1. Enable RLS and force it even for table owner</span>
+alter table posts enable row level security;
+alter table posts force row level security;
+
+<span class="cm">-- 2. Users can only read their own rows</span>
+create policy "posts: owner read"
+  on posts for select
+  to authenticated
+  using (user_id = auth.uid());
+
+<span class="cm">-- 3. Users can only insert rows they own</span>
+create policy "posts: owner insert"
+  on posts for insert
+  to authenticated
+  with check (user_id = auth.uid());
+
+<span class="cm">-- 4. Users can only update/delete their own rows</span>
+create policy "posts: owner modify"
+  on posts for update, delete
+  to authenticated
+  using (user_id = auth.uid());</pre>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-file">Avoid N+1 in policies — use security definer functions</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm">-- Bad: subquery re-evaluated per row</span>
+create policy "team member read"
+  on documents for select
+  using (team_id in (select team_id from team_members where user_id = auth.uid()));
+
+<span class="cm">-- Good: stable function evaluated once</span>
+create or replace function auth.user_team_ids()
+returns setof uuid language sql stable security definer as $$
+  select team_id from team_members where user_id = auth.uid();
+$$;
+
+create policy "team member read"
+  on documents for select
+  using (team_id = any(array(select auth.user_team_ids())));</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text"><strong>Enable RLS on every table</strong> that the <code>anon</code> or <code>authenticated</code> role can reach — including junction tables and lookup tables with sensitive keys.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>force row level security</code> so that even the table owner (Postgres superuser excluded) cannot bypass policies.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Write separate policies per operation (<code>select</code>, <code>insert</code>, <code>update</code>, <code>delete</code>) — overly broad <code>for all</code> policies hide intent and complicate audits.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Always use <code>auth.uid()</code> (not a passed parameter or header) as the identity anchor — it cannot be spoofed by a client.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Wrap repeated subqueries in <code>security definer</code> Postgres functions marked <code>stable</code> — the planner will cache them per query instead of re-evaluating per row.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Audit RLS coverage regularly: query <code>pg_tables</code> joined against <code>pg_policies</code> to find tables with RLS disabled or zero policies.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Test policies in isolation — write integration tests that authenticate as different users and assert that cross-tenant data is inaccessible.</span></li>
+        </ul>
+      </section>
+
+      <!-- ── 04 AUTHENTICATION ───────────────────────────────────────── -->
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>Authentication</h2></div>
+        <p class="sec-intro">Supabase Auth issues JWTs consumed directly by PostgREST and RLS policies. Keep tokens server-side, rotate secrets, and guard every protected route.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">middleware.ts — Next.js session refresh</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        ),
+      },
+    }
+  )
+  <span class="cm">// Refresh session — must call getUser() not getSession()</span>
+  await supabase.auth.getUser()
+  return response
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+}</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Call <code>supabase.auth.getUser()</code> (not <code>getSession()</code>) on the server to validate the JWT against Supabase Auth on every request — <code>getSession()</code> reads the cookie without server-side verification.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Run the session-refresh middleware on every route that might set cookies; missing it causes auth state to go stale after the JWT expires (default 1 hour).</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Protect routes server-side — redirect unauthenticated users in middleware or Server Components, never rely solely on client-side guards.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use OAuth providers (Google, GitHub, etc.) or Magic Link for consumer apps; reserve email/password only when required by the client's spec.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Store custom user data (display name, role, preferences) in a <code>profiles</code> table linked to <code>auth.users</code> via a trigger — never write directly into <code>auth.users</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Implement role-based access by storing roles in <code>app_metadata</code> (server-set, not editable by users) and checking <code>(auth.jwt() -&gt;&gt; 'app_metadata')::jsonb -&gt;&gt; 'role'</code> inside RLS policies.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Set <code>JWT expiry</code> to 3600 s (1 hour) in the Supabase dashboard and enable <code>Refresh Token Rotation</code> — never issue non-expiring tokens.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Rotate the <code>JWT secret</code> on a schedule or immediately after a suspected compromise — all existing sessions are invalidated on rotation.</span></li>
+        </ul>
+      </section>
+
+      <!-- ── 05 EDGE FUNCTIONS ───────────────────────────────────────── -->
+      <section id="s05">
+        <div class="sec-head"><span class="num">05</span><h2>Edge Functions</h2></div>
+        <p class="sec-intro">Edge Functions run Deno at the edge — use them for webhooks, scheduled jobs, and server-side logic that must not live in the client. Keep functions small and stateless.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">supabase/functions/send-welcome/index.ts</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre">import { createClient } from 'jsr:@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? '',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!   <span class="cm">// server-side only</span>
+  )
+
+  const { userId } = await req.json()
+  <span class="cm">// ... business logic</span>
+
+  return new Response(JSON.stringify({ ok: true }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})</pre>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-file">supabase/functions/.env — local secrets (never commit)</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre">ALLOWED_ORIGIN=https://app.example.com
+RESEND_API_KEY=re_…</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Always handle <code>OPTIONS</code> preflight requests and return the correct CORS headers — missing this is the most common Edge Function debugging trap.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Scope CORS: set <code>Access-Control-Allow-Origin</code> to the specific domain, never <code>*</code> when the function uses auth credentials or sensitive data.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Store secrets with <code>supabase secrets set KEY=value</code> (or via the dashboard) — never hard-code secrets or commit <code>.env</code> files.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use the <code>service_role</code> key only inside Edge Functions (server environment) — it is never passed to the client or stored in env vars prefixed with <code>NEXT_PUBLIC_</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Verify the caller's JWT when an Edge Function is invoked by a user: extract <code>Authorization: Bearer &lt;token&gt;</code> and call <code>supabase.auth.getUser(token)</code> before processing.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">For webhook receivers (Stripe, Resend, GitHub) verify the provider's signature before trusting the payload — reject unsigned requests with <code>403</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep functions single-purpose and stateless — shared logic belongs in a shared module imported by multiple functions, not in a mega-function with branching paths.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>supabase functions serve</code> locally with a <code>.env</code> file for development — test against a local Supabase instance (<code>supabase start</code>) to avoid hitting production data.</span></li>
+        </ul>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.code').forEach(block => {
+    const btn = block.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const text = block.querySelector('pre').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  });
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>
