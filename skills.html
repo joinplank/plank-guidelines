@@ -1,0 +1,654 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Skills — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:64px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    /* skill cards */
+    .skill-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+    @media(max-width:720px){.skill-grid{grid-template-columns:1fr;}}
+    .skill-card{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:18px 20px;transition:border-color .15s;}
+    .skill-card:hover{border-color:var(--clay);}
+    .skill-card.hidden{display:none;}
+    .skill-card.built-in{border-color:var(--clay);background:linear-gradient(135deg,#FFF8F5 0%,var(--white) 100%);}
+    .skill-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
+    .skill-name{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--slate);}
+    .skill-badge{font-family:var(--mono);font-size:10px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:5px;padding:2px 7px;color:var(--gray-700);white-space:nowrap;flex-shrink:0;}
+    .skill-badge.plank{background:var(--clay);border-color:var(--clay);color:var(--white);}
+    .skill-badge.ai{background:#E8F0E0;border-color:#C5D4B0;color:#4A5E35;}
+    .skill-badge.db{background:#E8EEF8;border-color:#B5C8E8;color:#2A4A7A;}
+    .skill-badge.frontend{background:#F0E8F8;border-color:#D0B5E8;color:#5A2A7A;}
+    .skill-badge.infra{background:#F8F0E0;border-color:#E8D0A0;color:#7A5A1A;}
+    .skill-badge.quality{background:#F0F8E8;border-color:#C0E0A0;color:#3A6A1A;}
+    .skill-desc{font-size:13px;color:var(--gray-500);line-height:1.5;}
+    .skill-trigger{margin-top:8px;font-size:12px;color:var(--gray-500);}
+    .skill-trigger strong{color:var(--gray-700);}
+
+    /* how-to-use box */
+    .usage-box{background:var(--slate);border-radius:14px;padding:24px 28px;margin-bottom:20px;color:#E8E6DE;}
+    .usage-box .ub-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;display:block;}
+    .usage-box h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--white);margin-bottom:8px;}
+    .usage-box p{font-size:13.5px;color:#B8B6AD;line-height:1.6;}
+    .usage-box code{background:rgba(255,255,255,.1);border:none;color:#C9B98A;}
+
+    /* table */
+    .table-wrap{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--gray-150);padding:11px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);border-bottom:1.5px solid var(--gray-300);}
+    td{padding:11px 16px;font-size:13.5px;border-bottom:1px solid var(--gray-300);vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    td:not(:last-child){border-right:1px solid var(--gray-300);}
+    td code{font-family:var(--mono);font-size:.82em;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Claude Code Skills</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Tooling · Claude Code</div>
+    <h1>Recommended Skills</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Plank built-in</div><div class="v accent">5</div></div>
+      <div class="cell"><div class="k">Third-party</div><div class="v">26</div></div>
+      <div class="cell"><div class="k">Categories</div><div class="v">6</div></div>
+      <div class="cell"><div class="k">Invoked via</div><div class="v">/skill-name</div></div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter skills…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> How skills work</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Plank built-in</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> AI / Agents</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Frontend</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Backend &amp; DB</a></li>
+        <li><a href="#s06" class="nav-link"><span class="nav-num">06</span> Infrastructure</a></li>
+        <li><a href="#s07" class="nav-link"><span class="nav-num">07</span> Code Quality</a></li>
+        <li><a href="#s08" class="nav-link"><span class="nav-num">08</span> Quick reference</a></li>
+      </ul>
+    </aside>
+
+    <main>
+
+      <!-- S01 How skills work -->
+      <section id="s01">
+        <div class="sec-head">
+          <span class="num">01</span>
+          <h2>How skills work</h2>
+        </div>
+        <p class="sec-intro">Skills are reusable instruction sets that Claude Code loads on demand. They live in <code>skills-lock.json</code> (third-party) or <code>.claude/skills/</code> (local) and are invoked with a slash command or triggered automatically by Claude when the task matches.</p>
+
+        <div class="usage-box">
+          <span class="ub-label">Invocation</span>
+          <h3>Three ways to activate a skill</h3>
+          <p>
+            <strong style="color:#E8E6DE">1. Slash command</strong> — type <code>/skill-name</code> at the start of a message to load the skill explicitly.<br><br>
+            <strong style="color:#E8E6DE">2. Auto-trigger</strong> — Claude detects matching keywords or file patterns and loads the skill automatically before responding.<br><br>
+            <strong style="color:#E8E6DE">3. Scoped skills</strong> — skills prefixed with a directory (e.g. <code>plank-guidelines:langchain-fundamentals</code>) activate only when the changed files are under that directory. The most specific match wins.
+          </p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>File</th><th>Purpose</th><th>Managed by</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>skills-lock.json</code></td><td>Third-party skills pinned by hash — sourced from GitHub</td><td><code>claude skills add &lt;source&gt;</code></td></tr>
+              <tr><td><code>.claude/skills/</code></td><td>Local skill SKILL.md files — project-specific</td><td>Manually authored</td></tr>
+              <tr><td>System skills</td><td>Built-in Plank skills distributed with Claude Code</td><td>Anthropic / Plank</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- S02 Plank built-in -->
+      <section id="s02">
+        <div class="sec-head">
+          <span class="num">02</span>
+          <h2>Plank built-in skills</h2>
+        </div>
+        <p class="sec-intro">These skills ship with Claude Code and encode Plank's own guidelines. They auto-trigger when you work in a Plank project and are the primary way Plank conventions are enforced during code generation.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card built-in" data-search="plank-backend typescript python fastify fastapi prisma architecture">
+            <div class="skill-top">
+              <span class="skill-name">/plank-backend</span>
+              <span class="skill-badge plank">Plank</span>
+            </div>
+            <p class="skill-desc">Applies Plank backend guidelines: TypeScript, Python, Fastify, FastAPI, Prisma, and Clean Architecture. Auto-triggers on backend service files.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> backend routes, services, repositories, Prisma schema edits</p>
+          </div>
+
+          <div class="skill-card built-in" data-search="plank-frontend react nextjs shadcn tailwind tanstack component">
+            <div class="skill-top">
+              <span class="skill-name">/plank-frontend</span>
+              <span class="skill-badge plank">Plank</span>
+            </div>
+            <p class="skill-desc">Applies Plank frontend guidelines: React, Next.js, Shadcn/ui, Tailwind, TanStack Query, accessibility rules, and component patterns.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> React components, pages, hooks, Tailwind config edits</p>
+          </div>
+
+          <div class="skill-card built-in" data-search="plank-ai langchain langgraph anthropic llm agent prompt">
+            <div class="skill-top">
+              <span class="skill-name">/plank-ai</span>
+              <span class="skill-badge plank">Plank</span>
+            </div>
+            <p class="skill-desc">Applies Plank AI/LLM guidelines: prompts as code, typed LangGraph state, cost attribution, and safety guardrails at output boundaries.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> LLM calls, agent definitions, prompt files, LangGraph graphs</p>
+          </div>
+
+          <div class="skill-card built-in" data-search="plank-infra terraform kubernetes helm aws gcp sentry devops">
+            <div class="skill-top">
+              <span class="skill-name">/plank-infra</span>
+              <span class="skill-badge plank">Plank</span>
+            </div>
+            <p class="skill-desc">Applies Plank infra/DevOps guidelines: Terraform, Kubernetes, Helm, AWS, GCP, Sentry, and security hardening rules.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> Terraform files, Helm charts, Kubernetes manifests, Dockerfiles</p>
+          </div>
+
+          <div class="skill-card built-in" data-search="plank-testing vitest playwright msw unit integration e2e evals">
+            <div class="skill-top">
+              <span class="skill-name">/plank-testing</span>
+              <span class="skill-badge plank">Plank</span>
+            </div>
+            <p class="skill-desc">Applies Plank testing guidelines: 70/20/10 pyramid, real DB integrations, MSW mocks, Playwright E2E, and LLM eval pipelines.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> test files, spec files, Playwright config</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S03 AI / Agents -->
+      <section id="s03">
+        <div class="sec-head">
+          <span class="num">03</span>
+          <h2>AI / Agent building</h2>
+        </div>
+        <p class="sec-intro">Skills for building AI-powered features with LangChain, LangGraph, and Deep Agents. Start with <code>/ecosystem-primer</code> before writing any agent code.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card" data-search="ecosystem-primer langchain langgraph deep-agents framework selection install">
+            <div class="skill-top">
+              <span class="skill-name">/ecosystem-primer</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Required first read for any agent project. Covers framework selection (LangChain vs LangGraph vs Deep Agents), install, environment setup, and which skill to load next.</p>
+            <p class="skill-trigger"><strong>Invoke first</strong> before any agent building skill</p>
+          </div>
+
+          <div class="skill-card" data-search="langchain-fundamentals create-agent tools middleware human-in-the-loop">
+            <div class="skill-top">
+              <span class="skill-name">/langchain-fundamentals</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Create LangChain agents with <code>create_agent</code>, define tools, and use middleware for human-in-the-loop and error handling.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> LangChain agent definitions, tool registrations</p>
+          </div>
+
+          <div class="skill-card" data-search="langchain-dependencies packages versions install pip npm langsmith">
+            <div class="skill-top">
+              <span class="skill-name">/langchain-dependencies</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Package versions, installation, and dependency management for LangChain, LangGraph, LangSmith, and Deep Agents in Python and TypeScript.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> setting up a new project or asking about package versions</p>
+          </div>
+
+          <div class="skill-card" data-search="langchain-middleware human-in-the-loop approval structured-output pydantic zod">
+            <div class="skill-top">
+              <span class="skill-name">/langchain-middleware</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Human-in-the-loop approval flows, custom middleware hooks, Command resume patterns, and structured output with Pydantic/Zod.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> adding HITL approval or custom middleware to a LangChain agent</p>
+          </div>
+
+          <div class="skill-card" data-search="langchain-rag retrieval augmented generation vector store embeddings chroma faiss pinecone">
+            <div class="skill-top">
+              <span class="skill-name">/langchain-rag</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">RAG system building: document loaders, text splitters, embeddings (OpenAI), and vector stores (Chroma, FAISS, Pinecone).</p>
+            <p class="skill-trigger"><strong>Use when:</strong> building any retrieval-augmented generation feature</p>
+          </div>
+
+          <div class="skill-card" data-search="langgraph-fundamentals stategraph state nodes edges command send streaming">
+            <div class="skill-top">
+              <span class="skill-name">/langgraph-fundamentals</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Core LangGraph: StateGraph, state schemas, nodes, edges, Command, Send, invoke, streaming, and error handling.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> any LangGraph code</p>
+          </div>
+
+          <div class="skill-card" data-search="langgraph-cli scaffold dev build deploy langgraph.json">
+            <div class="skill-top">
+              <span class="skill-name">/langgraph-cli</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">LangGraph CLI: <code>langgraph new</code>, <code>dev</code>, <code>build</code>, <code>up</code>, <code>deploy</code>, and <code>langgraph.json</code> configuration.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> scaffolding or deploying a LangGraph project</p>
+          </div>
+
+          <div class="skill-card" data-search="langgraph-human-in-the-loop interrupt command resume approval error handling">
+            <div class="skill-top">
+              <span class="skill-name">/langgraph-human-in-the-loop</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Pause-for-approval patterns: <code>interrupt()</code>, <code>Command(resume=…)</code>, approval/validation workflows, and the 4-tier error handling strategy.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> adding interrupts, approval gates, or error recovery to a LangGraph graph</p>
+          </div>
+
+          <div class="skill-card" data-search="langgraph-persistence checkpointer thread-id state memory time-travel store">
+            <div class="skill-top">
+              <span class="skill-name">/langgraph-persistence</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">State persistence: checkpointers, <code>thread_id</code>, time travel, Store API, and subgraph checkpointer scoping.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> adding memory or conversation history to a LangGraph agent</p>
+          </div>
+
+          <div class="skill-card" data-search="deep-agents-core create-deep-agent harness SKILL.md configuration">
+            <div class="skill-top">
+              <span class="skill-name">/deep-agents-core</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Deep Agents fundamentals: <code>create_deep_agent()</code>, harness architecture, SKILL.md format, and configuration options.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> building any Deep Agents application</p>
+          </div>
+
+          <div class="skill-card" data-search="deep-agents-memory state store filesystem persistence composite-backend">
+            <div class="skill-top">
+              <span class="skill-name">/deep-agents-memory</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Deep Agents persistence: StateBackend (ephemeral), StoreBackend (persistent), FilesystemMiddleware, and CompositeBackend for routing.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> a Deep Agent needs memory, state, or file access</p>
+          </div>
+
+          <div class="skill-card" data-search="deep-agents-orchestration subagents task planning HITL interrupts">
+            <div class="skill-top">
+              <span class="skill-name">/deep-agents-orchestration</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Multi-agent orchestration: SubAgentMiddleware, TodoList planning, and human-in-the-loop interrupts within Deep Agents.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> building multi-agent pipelines or adding HITL to a Deep Agent</p>
+          </div>
+
+          <div class="skill-card" data-search="managed-deep-agents langsmith deploy SDK react useStream MCP REST">
+            <div class="skill-top">
+              <span class="skill-name">/managed-deep-agents</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Deploy and operate Managed Deep Agents in LangSmith: <code>deepagents-cli</code>, Python/TypeScript SDKs, React <code>useStream</code>, REST fallbacks, MCP tools, and interrupts.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> deploying a Deep Agent to LangSmith managed infrastructure</p>
+          </div>
+
+          <div class="skill-card" data-search="swarm parallel fan-out subagents aggregate table batch">
+            <div class="skill-top">
+              <span class="skill-name">/swarm</span>
+              <span class="skill-badge ai">AI</span>
+            </div>
+            <p class="skill-desc">Fan out many independent items in parallel using a table-driven pattern: one row = one unit of work dispatched to a subagent. Aggregate results automatically.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> processing a batch of independent items concurrently</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S04 Frontend -->
+      <section id="s04">
+        <div class="sec-head">
+          <span class="num">04</span>
+          <h2>Frontend libraries</h2>
+        </div>
+        <p class="sec-intro">UI component libraries, mobile frameworks, and styling helpers. These skills load library-specific docs and best practices directly into the Claude context.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card" data-search="shadcn-ui react components accessible design system radix">
+            <div class="skill-top">
+              <span class="skill-name">/shadcn-ui</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">Shadcn/ui component patterns, installation, theming, and accessibility best practices for React projects.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> Shadcn component imports or <code>components/ui/</code> edits</p>
+          </div>
+
+          <div class="skill-card" data-search="web-design-guidelines layout typography color responsive vercel">
+            <div class="skill-top">
+              <span class="skill-name">/web-design-guidelines</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">Web design principles: layout, typography, color, spacing, and responsive design guidelines from Vercel's design system.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> building new UI pages or reviewing visual design</p>
+          </div>
+
+          <div class="skill-card" data-search="vercel-react-native-skills react native mobile ios android expo">
+            <div class="skill-top">
+              <span class="skill-name">/vercel-react-native-skills</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">React Native patterns and best practices for cross-platform mobile development in Expo projects.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> React Native component files and mobile-specific code</p>
+          </div>
+
+          <div class="skill-card" data-search="nuxt-ui vue nuxt component library tailwind">
+            <div class="skill-top">
+              <span class="skill-name">/nuxt-ui</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">Nuxt UI component library patterns, configuration, and theming for Vue/Nuxt projects.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> Nuxt UI component usage in Vue/Nuxt projects</p>
+          </div>
+
+          <div class="skill-card" data-search="expo-tailwind-setup nativewind tailwind css react-native styling">
+            <div class="skill-top">
+              <span class="skill-name">/expo-tailwind-setup</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">Set up Tailwind CSS v4 in Expo with <code>react-native-css</code> and NativeWind v5 for universal styling across iOS, Android, and web.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> adding Tailwind to an Expo project</p>
+          </div>
+
+          <div class="skill-card" data-search="expo-deployment eas build submit app store testflight android ios production">
+            <div class="skill-top">
+              <span class="skill-name">/expo-deployment</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">Deploy Expo apps to production with EAS: build and submit to App Store and Google Play, manage build numbers, ASO metadata, and EAS Hosting.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> preparing a production Expo build or shipping to app stores</p>
+          </div>
+
+          <div class="skill-card" data-search="expo-cicd-workflows eas workflow yaml pipeline ci cd automation">
+            <div class="skill-top">
+              <span class="skill-name">/expo-cicd-workflows</span>
+              <span class="skill-badge frontend">Frontend</span>
+            </div>
+            <p class="skill-desc">EAS workflow YAML authoring for Expo CI/CD pipelines, <code>.eas/workflows/</code> configuration, and build automation.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> writing or editing EAS workflow files</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S05 Backend & DB -->
+      <section id="s05">
+        <div class="sec-head">
+          <span class="num">05</span>
+          <h2>Backend &amp; Database</h2>
+        </div>
+        <p class="sec-intro">Skills for backend frameworks, database clients, and monorepo tooling.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card" data-search="fastify typescript node server routes plugins hooks">
+            <div class="skill-top">
+              <span class="skill-name">/fastify</span>
+              <span class="skill-badge db">Backend</span>
+            </div>
+            <p class="skill-desc">Fastify server setup, plugin architecture, typed routes, hooks, and error handling patterns for TypeScript services.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> Fastify route files and plugin definitions</p>
+          </div>
+
+          <div class="skill-card" data-search="prisma-client-api orm queries relations migrations schema typescript">
+            <div class="skill-top">
+              <span class="skill-name">/prisma-client-api</span>
+              <span class="skill-badge db">Backend</span>
+            </div>
+            <p class="skill-desc">Prisma Client API reference: queries, mutations, relations, transactions, and type-safe patterns for TypeScript and Python.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> Prisma client calls and <code>schema.prisma</code> edits</p>
+          </div>
+
+          <div class="skill-card" data-search="prisma-postgres database postgres connection pooling migrations pgbouncer">
+            <div class="skill-top">
+              <span class="skill-name">/prisma-postgres</span>
+              <span class="skill-badge db">Backend</span>
+            </div>
+            <p class="skill-desc">Prisma with PostgreSQL: connection pooling, Prisma Postgres managed DB, migrations, and performance best practices.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> configuring Prisma with a Postgres database</p>
+          </div>
+
+          <div class="skill-card" data-search="supabase-postgres database rls row level security postgres best practices">
+            <div class="skill-top">
+              <span class="skill-name">/supabase-postgres-best-practices</span>
+              <span class="skill-badge db">Backend</span>
+            </div>
+            <p class="skill-desc">Supabase/Postgres best practices: RLS policies, schema design, indexing, and Supabase-specific SQL patterns.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> working with a Supabase project or writing Postgres SQL</p>
+          </div>
+
+          <div class="skill-card" data-search="turborepo monorepo workspace caching pipeline tasks build">
+            <div class="skill-top">
+              <span class="skill-name">/turborepo</span>
+              <span class="skill-badge db">Backend</span>
+            </div>
+            <p class="skill-desc">Turborepo monorepo setup: workspace configuration, pipeline caching, task dependencies, and remote cache integration.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> <code>turbo.json</code> and monorepo workspace edits</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S06 Infrastructure -->
+      <section id="s06">
+        <div class="sec-head">
+          <span class="num">06</span>
+          <h2>Infrastructure</h2>
+        </div>
+        <p class="sec-intro">Skills for cloud infrastructure, IaC, and cloud migration tooling.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card" data-search="terraform-style-guide iac hashicorp hcl modules state naming">
+            <div class="skill-top">
+              <span class="skill-name">/terraform-style-guide</span>
+              <span class="skill-badge infra">Infra</span>
+            </div>
+            <p class="skill-desc">Terraform code style: HCL formatting, module structure, naming conventions, state management, and security best practices.</p>
+            <p class="skill-trigger"><strong>Triggers on:</strong> <code>.tf</code> file edits</p>
+          </div>
+
+          <div class="skill-card" data-search="aws-transform migrate modernize dotnet java cobol legacy upgrade sdk">
+            <div class="skill-top">
+              <span class="skill-name">/aws-transform</span>
+              <span class="skill-badge infra">Infra</span>
+            </div>
+            <p class="skill-desc">Migrate and modernize codebases to AWS: .NET Framework → .NET 8/10, COBOL → Java, VMware → EC2, SQL Server → Aurora, and SDK upgrades.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> migrating a legacy codebase to AWS or upgrading runtimes</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S07 Code Quality -->
+      <section id="s07">
+        <div class="sec-head">
+          <span class="num">07</span>
+          <h2>Code quality &amp; workflow</h2>
+        </div>
+        <p class="sec-intro">Skills for code quality practices, development workflows, and productivity.</p>
+
+        <div class="skill-grid">
+          <div class="skill-card" data-search="tdd test-driven development red green refactor unit tests">
+            <div class="skill-top">
+              <span class="skill-name">/tdd</span>
+              <span class="skill-badge quality">Quality</span>
+            </div>
+            <p class="skill-desc">Test-driven development workflow: red → green → refactor cycle, naming conventions, and test structure best practices.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> writing new features test-first or learning TDD patterns</p>
+          </div>
+
+          <div class="skill-card" data-search="clean-code naming functions classes error handling structure readable">
+            <div class="skill-top">
+              <span class="skill-name">/clean-code</span>
+              <span class="skill-badge quality">Quality</span>
+            </div>
+            <p class="skill-desc">Robert C. Martin's Clean Code principles: naming, function size, class structure, error handling, and code readability rules.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> writing, reviewing, or refactoring any code</p>
+          </div>
+
+          <div class="skill-card" data-search="programming-organizer specs run-specs orchestrator codeagent testagent reviewagent report">
+            <div class="skill-top">
+              <span class="skill-name">/programming-organizer</span>
+              <span class="skill-badge quality">Quality</span>
+            </div>
+            <p class="skill-desc">Spec-driven orchestrator. Reads <code>specs/</code>, then runs CodeAgent → TestAgent → ReviewAgent in sequence and writes an HTML report to <code>reports/</code>.</p>
+            <p class="skill-trigger"><strong>Trigger:</strong> say <strong>run specs</strong> or type <code>/programming-organizer [spec-name]</code></p>
+          </div>
+
+          <div class="skill-card" data-search="caveman compressed tokens brief terse ultra lite mode">
+            <div class="skill-top">
+              <span class="skill-name">/caveman</span>
+              <span class="skill-badge quality">Quality</span>
+            </div>
+            <p class="skill-desc">Ultra-compressed communication mode. Cuts token usage ~75% by speaking tersely while keeping full technical accuracy. Levels: lite, full, ultra.</p>
+            <p class="skill-trigger"><strong>Use when:</strong> you want shorter responses or need to conserve tokens</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S08 Quick reference -->
+      <section id="s08">
+        <div class="sec-head">
+          <span class="num">08</span>
+          <h2>Quick reference</h2>
+        </div>
+        <p class="sec-intro">All skills at a glance — sorted by category.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Skill</th><th>Category</th><th>When to use</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>/plank-backend</code></td><td>Plank</td><td>Any backend service file — auto-triggers</td></tr>
+              <tr><td><code>/plank-frontend</code></td><td>Plank</td><td>React/Next.js components — auto-triggers</td></tr>
+              <tr><td><code>/plank-ai</code></td><td>Plank</td><td>LLM calls and agent code — auto-triggers</td></tr>
+              <tr><td><code>/plank-infra</code></td><td>Plank</td><td>IaC and Kubernetes files — auto-triggers</td></tr>
+              <tr><td><code>/plank-testing</code></td><td>Plank</td><td>Test files — auto-triggers</td></tr>
+              <tr><td><code>/ecosystem-primer</code></td><td>AI</td><td>Before any agent project — invoke first</td></tr>
+              <tr><td><code>/langchain-fundamentals</code></td><td>AI</td><td>Writing LangChain agents and tools</td></tr>
+              <tr><td><code>/langchain-dependencies</code></td><td>AI</td><td>Package versions and install setup</td></tr>
+              <tr><td><code>/langchain-middleware</code></td><td>AI</td><td>HITL approval and custom middleware</td></tr>
+              <tr><td><code>/langchain-rag</code></td><td>AI</td><td>Any RAG / retrieval system</td></tr>
+              <tr><td><code>/langgraph-fundamentals</code></td><td>AI</td><td>Any LangGraph graph — auto-triggers</td></tr>
+              <tr><td><code>/langgraph-cli</code></td><td>AI</td><td>Scaffolding or deploying LangGraph projects</td></tr>
+              <tr><td><code>/langgraph-human-in-the-loop</code></td><td>AI</td><td>Interrupt and approval patterns in graphs</td></tr>
+              <tr><td><code>/langgraph-persistence</code></td><td>AI</td><td>State persistence and memory in graphs</td></tr>
+              <tr><td><code>/deep-agents-core</code></td><td>AI</td><td>Any Deep Agents application</td></tr>
+              <tr><td><code>/deep-agents-memory</code></td><td>AI</td><td>Deep Agent needing state or file access</td></tr>
+              <tr><td><code>/deep-agents-orchestration</code></td><td>AI</td><td>Multi-agent pipelines or HITL in Deep Agents</td></tr>
+              <tr><td><code>/managed-deep-agents</code></td><td>AI</td><td>Deploying to LangSmith managed infra</td></tr>
+              <tr><td><code>/swarm</code></td><td>AI</td><td>Fan out parallel batch work to subagents</td></tr>
+              <tr><td><code>/shadcn-ui</code></td><td>Frontend</td><td>Shadcn/ui component usage</td></tr>
+              <tr><td><code>/web-design-guidelines</code></td><td>Frontend</td><td>New UI pages or visual design review</td></tr>
+              <tr><td><code>/vercel-react-native-skills</code></td><td>Frontend</td><td>React Native / Expo mobile code</td></tr>
+              <tr><td><code>/nuxt-ui</code></td><td>Frontend</td><td>Vue / Nuxt projects with Nuxt UI</td></tr>
+              <tr><td><code>/expo-tailwind-setup</code></td><td>Frontend</td><td>Adding Tailwind to Expo</td></tr>
+              <tr><td><code>/expo-deployment</code></td><td>Frontend</td><td>EAS build and App Store submission</td></tr>
+              <tr><td><code>/expo-cicd-workflows</code></td><td>Frontend</td><td>EAS workflow YAML authoring</td></tr>
+              <tr><td><code>/fastify</code></td><td>Backend</td><td>Fastify route and plugin definitions</td></tr>
+              <tr><td><code>/prisma-client-api</code></td><td>Backend</td><td>Prisma queries and schema edits</td></tr>
+              <tr><td><code>/prisma-postgres</code></td><td>Backend</td><td>Prisma with Postgres setup</td></tr>
+              <tr><td><code>/supabase-postgres-best-practices</code></td><td>Backend</td><td>Supabase / Postgres SQL</td></tr>
+              <tr><td><code>/turborepo</code></td><td>Backend</td><td>Monorepo workspace and pipeline config</td></tr>
+              <tr><td><code>/terraform-style-guide</code></td><td>Infra</td><td>Any <code>.tf</code> file — auto-triggers</td></tr>
+              <tr><td><code>/aws-transform</code></td><td>Infra</td><td>Legacy codebase migration to AWS</td></tr>
+              <tr><td><code>/tdd</code></td><td>Quality</td><td>Writing features test-first</td></tr>
+              <tr><td><code>/clean-code</code></td><td>Quality</td><td>Any code write, review, or refactor</td></tr>
+              <tr><td><code>/programming-organizer</code></td><td>Quality</td><td>Say <strong>run specs</strong> to orchestrate full pipeline</td></tr>
+              <tr><td><code>/caveman</code></td><td>Quality</td><td>Terse mode — fewer tokens</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="no-results" id="no-results">No skills match your search.</p>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  const search = document.getElementById('search');
+  const noRes  = document.getElementById('no-results');
+
+  // sidebar active highlighting
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('.nav-link');
+  const observer  = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // search
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let visible = 0;
+    document.querySelectorAll('.skill-card').forEach(card => {
+      const text = (card.textContent + ' ' + (card.dataset.search || '')).toLowerCase();
+      const match = !q || text.includes(q);
+      card.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+    noRes.classList.toggle('visible', visible === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>

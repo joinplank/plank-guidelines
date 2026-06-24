@@ -1,0 +1,207 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .tag{font-family:var(--mono);font-size:11.5px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:6px;padding:3px 10px;color:var(--gray-700);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    /* principle cards grid */
+    .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px;}
+    @media(max-width:640px){.principles{grid-template-columns:1fr;}}
+    .principle-card{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:18px 20px;transition:border-color .15s;}
+    .principle-card:hover{border-color:var(--clay);}
+    .principle-card .pc-label{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--clay);margin-bottom:6px;}
+    .principle-card h3{font-family:var(--serif);font-weight:500;font-size:17px;color:var(--slate);margin-bottom:6px;}
+    .principle-card p{font-size:13px;color:var(--gray-500);line-height:1.5;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Frontend</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Frontend</div>
+    <h1>Frontend Guidelines</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Framework</div><div class="v">Next.js</div></div>
+      <div class="cell"><div class="k">UI Library</div><div class="v">Shadcn/ui</div></div>
+      <div class="cell"><div class="k">State</div><div class="v accent">TanStack</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">4</div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">React</span><span class="tag">Next.js</span><span class="tag">Shadcn/ui</span>
+      <span class="tag">Tailwind</span><span class="tag">TanStack Query</span><span class="tag">TanStack Router</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Component Design</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Data Fetching</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Styling</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Quality</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Component Design</h2></div>
+        <p class="sec-intro">Server Components by default in the App Router. Push the client boundary as far toward the leaves as possible.</p>
+
+        <div class="principles">
+          <div class="principle-card">
+            <div class="pc-label">Pattern</div>
+            <h3>Server-first</h3>
+            <p>Default to Server Components. Add <code>'use client'</code> only when you need interactivity, hooks, or browser APIs.</p>
+          </div>
+          <div class="principle-card">
+            <div class="pc-label">Pattern</div>
+            <h3>Props down, events up</h3>
+            <p>Avoid prop drilling beyond 2 levels. Use context or a state manager for shared state across the tree.</p>
+          </div>
+          <div class="principle-card">
+            <div class="pc-label">Pattern</div>
+            <h3>Shadcn customization</h3>
+            <p>Shadcn components are copied source. Customize via <code>cn()</code> and variants — never edit the primitive directly.</p>
+          </div>
+          <div class="principle-card">
+            <div class="pc-label">Pattern</div>
+            <h3>Co-location</h3>
+            <p>Keep component, styles, and tests in the same folder. One directory = one responsibility.</p>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Server Components by default in Next.js App Router — client boundary only when needed (interactivity, hooks, browser APIs).</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Shadcn components are copied source — customize via <code>cn()</code> and variants, not direct edits to primitives.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Props down, events up. Avoid prop drilling beyond 2 levels — use context or state manager.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Co-locate component, styles, and tests in the same folder.</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>Data Fetching</h2></div>
+        <p class="sec-intro">TanStack Query owns all client-side async state. No exceptions for useEffect-based fetching.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">TanStack Query for all client-side async state. No <code>useEffect</code> for data fetching.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Define query keys as typed constants, not inline strings.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Optimistic updates for mutations on user-facing actions.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Server Actions for form mutations in App Router; avoid REST round-trips for simple writes.</span></li>
+        </ul>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Styling</h2></div>
+        <p class="sec-intro">Tailwind utilities only. Design tokens live in <code>tailwind.config</code>, not scattered as hardcoded values.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Tailwind utility classes only — no custom CSS files unless for global resets or Tailwind theme tokens.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Design tokens via <code>tailwind.config</code> theme extension, not hardcoded values in classnames.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Responsive-first: mobile breakpoint is the base, <code>md:</code>/<code>lg:</code> for wider screens.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Dark mode via Tailwind <code>dark:</code> variant — never manual class toggling.</span></li>
+        </ul>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>Quality</h2></div>
+        <p class="sec-intro">Strict TypeScript, Zod at boundaries, accessibility by default, and bundle hygiene before merging large deps.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Strict TypeScript: match backend strictness config. No <code>as any</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Zod for form validation and API response parsing on the client.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Accessibility: semantic HTML, ARIA labels on icon-only buttons, keyboard navigation tested.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Bundle analysis before merging large deps — check with Next.js bundle analyzer.</span></li>
+        </ul>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testing — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .tag{font-family:var(--mono);font-size:11.5px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:6px;padding:3px 10px;color:var(--gray-700);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    /* pyramid visualization */
+    .pyramid{display:flex;flex-direction:column;align-items:center;gap:0;margin-bottom:32px;max-width:400px;}
+    .pyr-row{display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--white);font-family:var(--mono);font-size:12px;font-weight:600;transition:filter .15s;cursor:default;}
+    .pyr-row:hover{filter:brightness(1.1);}
+    .pyr-unit{width:48px;height:44px;}
+    .pyr-e2e{background:var(--clay);width:144px;height:56px;border-radius:10px 10px 4px 4px;}
+    .pyr-int{background:#9B7A5E;width:240px;height:56px;}
+    .pyr-unit-row{background:var(--olive);width:336px;height:56px;border-radius:4px 4px 10px 10px;}
+    .pyr-label{font-size:11px;}
+    .pyr-pct{font-size:16px;margin-right:6px;}
+    .pyr-legend{display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:var(--gray-500);}
+    .pyr-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Testing</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Testing</div>
+    <h1>Testing Guidelines</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Pyramid</div><div class="v accent">70/20/10</div></div>
+      <div class="cell"><div class="k">Unit+Int</div><div class="v">Vitest</div></div>
+      <div class="cell"><div class="k">E2E</div><div class="v">Playwright</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">4</div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">Vitest</span><span class="tag">Playwright</span><span class="tag">MSW</span>
+      <span class="tag">RTL</span><span class="tag">AI Evals</span><span class="tag">fast-check</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Strategy</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Backend Tests</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Frontend Tests</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> AI Pipeline Tests</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Strategy</h2></div>
+        <p class="sec-intro">Test behavior, not implementation. Coverage is a floor not a goal. Flaky tests are bugs — fix or delete immediately.</p>
+
+        <div class="pyramid">
+          <div class="pyr-row pyr-e2e"><span class="pyr-pct">10%</span><span class="pyr-label">E2E</span></div>
+          <div class="pyr-row pyr-int"><span class="pyr-pct">20%</span><span class="pyr-label">Integration</span></div>
+          <div class="pyr-row pyr-unit-row"><span class="pyr-pct">70%</span><span class="pyr-label">Unit</span></div>
+          <div class="pyr-legend">
+            <span><span class="pyr-dot" style="background:var(--olive)"></span>Unit</span>
+            <span><span class="pyr-dot" style="background:#9B7A5E"></span>Integration</span>
+            <span><span class="pyr-dot" style="background:var(--clay)"></span>E2E</span>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Pyramid: many unit tests, fewer integration, minimal E2E. Ratio roughly 70/20/10.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Test behavior, not implementation — no assertions on private methods or internal state.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Coverage gate in CI (&gt;80% lines), but coverage is a floor not a goal.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flaky tests are bugs — fix or delete immediately; never skip and move on.</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>Backend Tests</h2></div>
+        <p class="sec-intro">Real DB for integration tests, mocked repos for unit tests, contract tests on the HTTP surface.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Unit: pure domain/use-case logic with mocked repositories.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Integration: real DB (Postgres in Docker), real Prisma client, seeded fixtures.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">API contract tests against route handlers — test the HTTP surface, not internals.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Property-based tests for data-transformation and parser functions (fast-check / Hypothesis).</span></li>
+        </ul>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Frontend Tests</h2></div>
+        <p class="sec-intro">Mock at MSW layer, not module level. Playwright for critical user flows only.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Vitest for unit/component tests; React Testing Library for component behavior.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Mock network at the MSW layer, not at module level — tests closer to real app behavior.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Playwright for E2E critical paths only: auth, checkout, key user flows.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Visual regression with Playwright screenshots on design-system components.</span></li>
+        </ul>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>AI Pipeline Tests</h2></div>
+        <p class="sec-intro">Evals over unit tests for LLM outputs. Golden datasets, latency regression tests, and chaos injection for agent graphs.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Evals over unit tests for LLM outputs — define expected quality metrics, not exact strings.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Golden dataset of inputs/expected outputs; run evals on every prompt change in CI.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Latency and cost regression tests: alert if avg tokens or p95 latency regresses &gt;20%.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Chaos tests for agent graphs: inject tool failures, verify state recovery and human escalation.</span></li>
+        </ul>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>

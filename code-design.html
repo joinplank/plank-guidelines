@@ -1,0 +1,273 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend Code Design — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+
+    section{margin-bottom:72px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:720px;margin-bottom:28px;}
+
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+
+    .code-wrap{position:relative;}
+    .code{background:var(--slate);border-radius:12px;padding:20px 22px;overflow-x:auto;position:relative;}
+    .code pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8E6DE;white-space:pre;}
+    .code .cm{color:var(--gray-500);}
+    .code .kw{color:var(--clay);}
+    .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;transition:background .15s,color .15s;}
+    .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+    .copy-btn.copied{color:#a8d8a8;border-color:#a8d8a8;}
+
+    /* layer cards */
+    .layers{display:flex;flex-direction:column;gap:0;margin-bottom:32px;}
+    .layer{border:1.5px solid var(--gray-300);border-radius:0;padding:0;background:var(--white);transition:border-color .15s;cursor:pointer;}
+    .layer:first-child{border-radius:12px 12px 0 0;}
+    .layer:last-child{border-radius:0 0 12px 12px;}
+    .layer+.layer{border-top:none;}
+    .layer.active{border-color:var(--clay);z-index:1;position:relative;}
+    .layer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;}
+    .layer-left{display:flex;align-items:center;gap:14px;}
+    .layer-badge{font-family:var(--mono);font-size:11px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:6px;white-space:nowrap;}
+    .layer-badge.infra{background:#DDE8D4;color:#2E4A1E;}
+    .layer-badge.shared{background:#E8E4D4;color:#4A3E1E;}
+    .layer h3{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--slate);}
+    .layer-desc{font-size:13px;color:var(--gray-500);}
+    .layer-toggle{font-family:var(--mono);font-size:18px;color:var(--gray-300);transition:transform .2s;}
+    .layer.open .layer-toggle{transform:rotate(45deg);color:var(--clay);}
+    .layer-body{display:none;padding:0 20px 16px;border-top:1px solid var(--gray-300);}
+    .layer.open .layer-body{display:block;}
+    .layer-files{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
+    .layer-file{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12.5px;color:var(--gray-700);}
+    .file-dot{width:6px;height:6px;border-radius:50%;background:var(--clay);flex-shrink:0;}
+    .file-dot.green{background:var(--olive);}
+    .file-dot.tan{background:#9B8060;}
+    .file-note{font-size:12px;color:var(--gray-500);margin-left:4px;}
+
+    /* rules list */
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:24px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Backend Code Design</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Architecture</div>
+    <h1>Backend Code Design</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Top layers</div><div class="v">3</div></div>
+      <div class="cell"><div class="k">Per module</div><div class="v accent">5 files</div></div>
+      <div class="cell"><div class="k">Pattern</div><div class="v">Slice</div></div>
+      <div class="cell"><div class="k">DI</div><div class="v">Awilix</div></div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="num">01</span><h2>App Layers</h2></div>
+    <p class="sec-intro">Three layers: <strong>Application</strong> for business modules, <strong>Infrastructure</strong> for external integrations, and <strong>Shared</strong> for utilities and DI config. Click any layer to explore its structure.</p>
+
+    <div class="layers">
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-head">
+          <div class="layer-left">
+            <span class="layer-badge">application/</span>
+            <div>
+              <h3>Application</h3>
+              <div class="layer-desc">Business modules — each owns its full vertical slice</div>
+            </div>
+          </div>
+          <span class="layer-toggle">+</span>
+        </div>
+        <div class="layer-body">
+          <p style="font-size:13.5px;color:var(--gray-500);margin-bottom:12px;">Every module follows the same 5-file anatomy. Add a new module by copying the pattern — no framework registration needed beyond DI.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">agent/ (example module)</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot"></span>agent.router.ts<span class="file-note">— route definitions</span></div>
+                <div class="layer-file"><span class="file-dot"></span>agent.controller.ts<span class="file-note">— req/res only</span></div>
+                <div class="layer-file"><span class="file-dot"></span>agent.service.ts<span class="file-note">— business logic</span></div>
+                <div class="layer-file"><span class="file-dot"></span>agent.model.ts<span class="file-note">— types / schemas</span></div>
+                <div class="layer-file"><span class="file-dot"></span>agent.repository.ts<span class="file-note">— DB access</span></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">user/ (example module)</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot"></span>user.router.ts</div>
+                <div class="layer-file"><span class="file-dot"></span>user.controller.ts</div>
+                <div class="layer-file"><span class="file-dot"></span>user.service.ts</div>
+                <div class="layer-file"><span class="file-dot"></span>user.model.ts</div>
+                <div class="layer-file"><span class="file-dot"></span>user.repository.ts</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-head">
+          <div class="layer-left">
+            <span class="layer-badge infra">infrastructure/</span>
+            <div>
+              <h3>Infrastructure</h3>
+              <div class="layer-desc">Tools, database abstraction, and external service providers</div>
+            </div>
+          </div>
+          <span class="layer-toggle">+</span>
+        </div>
+        <div class="layer-body">
+          <p style="font-size:13.5px;color:var(--gray-500);margin-bottom:12px;">Nothing in the application layer imports from here directly — providers are injected. The database repository is the only shared DB primitive.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">tools/</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot green"></span>io.tool.ts</div>
+                <div class="layer-file"><span class="file-dot green"></span>search-web.tool.ts</div>
+                <div class="layer-file"><span class="file-dot green"></span>fetch.tool.ts</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">database/</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot green"></span>database.repository.ts<span class="file-note">— base</span></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">providers/</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot green"></span>s3.provider.ts</div>
+                <div class="layer-file"><span class="file-dot green"></span>resend.provider.ts</div>
+                <div class="layer-file"><span class="file-dot green"></span>sentry.provider.ts</div>
+                <div class="layer-file"><span class="file-dot green"></span>auth0.provider.ts</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-head">
+          <div class="layer-left">
+            <span class="layer-badge shared">shared/</span>
+            <div>
+              <h3>Shared</h3>
+              <div class="layer-desc">Pure utilities and DI container config</div>
+            </div>
+          </div>
+          <span class="layer-toggle">+</span>
+        </div>
+        <div class="layer-body">
+          <p style="font-size:13.5px;color:var(--gray-500);margin-bottom:12px;">Only pure functions and config live here — no business logic, no imports from application or infrastructure layers.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">utils/</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot tan"></span>date.utils.ts</div>
+                <div class="layer-file"><span class="file-dot tan"></span>string.utils.ts</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:10px;">config/</div>
+              <div class="layer-files">
+                <div class="layer-file"><span class="file-dot tan"></span>awilix.config.ts<span class="file-note">— DI container</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code">
+        <button class="copy-btn">Copy</button>
+        <pre>application/
+  agent/
+    agent.router.ts        <span class="cm"># route definitions</span>
+    agent.controller.ts    <span class="cm"># request/response handling</span>
+    agent.service.ts       <span class="cm"># business logic</span>
+    agent.model.ts         <span class="cm"># types / schemas</span>
+    agent.repository.ts    <span class="cm"># DB access for this module</span>
+  user/
+    user.router.ts
+    user.controller.ts
+    user.service.ts
+    user.model.ts
+    user.repository.ts
+infrastructure/
+  tools/
+    io.tool.ts
+    search-web.tool.ts
+    fetch.tool.ts
+  database/
+    database.repository.ts  <span class="cm"># base repository — used by module repositories</span>
+  providers/
+    s3.provider.ts
+    resend.provider.ts
+    sentry.provider.ts
+    auth0.provider.ts
+shared/
+  utils/
+    date.utils.ts
+    string.utils.ts
+  config/
+    awilix.config.ts         <span class="cm"># DI container registration</span></pre>
+      </div>
+    </div>
+
+    <ul class="rules-list">
+      <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Business logic lives in the service layer — controllers only parse input and format output.</span></li>
+      <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Repositories abstract all DB access; services never call Prisma directly.</span></li>
+      <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Infrastructure providers are injected via Awilix, not imported directly in services.</span></li>
+      <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep modules self-contained; cross-module calls go service → service, never repository → repository.</span></li>
+      <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text"><code>shared/</code> contains only pure functions and config — no business logic, no framework imports.</span></li>
+    </ul>
+  </section>
+</div>
+<script>
+  function toggleLayer(el) {
+    el.classList.toggle('open');
+    el.classList.toggle('active', el.classList.contains('open'));
+  }
+
+  document.querySelectorAll('.code').forEach(block => {
+    const btn = block.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const text = block.querySelector('pre').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  });
+</script>
+</body>
+</html>

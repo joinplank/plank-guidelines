@@ -1,0 +1,338 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plank Dev Guidelines</title>
+  <style>
+    :root {
+      --ivory:    #FAF9F5;
+      --slate:    #141413;
+      --clay:     #D97757;
+      --oat:      #E3DACC;
+      --olive:    #788C5D;
+      --gray-150: #F0EEE6;
+      --gray-300: #D1CFC5;
+      --gray-500: #87867F;
+      --gray-700: #3D3D3A;
+      --white:    #FFFFFF;
+      --serif: ui-serif, Georgia, 'Times New Roman', serif;
+      --sans:  system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono:  ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--ivory); color: var(--gray-700); line-height: 1.55; padding: 56px 32px 120px; -webkit-font-smoothing: antialiased; }
+    .page { max-width: 1120px; margin: 0 auto; }
+
+    header.page-head { margin-bottom: 48px; max-width: 820px; }
+    .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 12px; }
+    h1 { font-family: var(--serif); font-weight: 500; font-size: 42px; line-height: 1.12; color: var(--slate); margin-bottom: 20px; letter-spacing: -0.015em; }
+    .prompt-box { background: var(--gray-150); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 16px 20px; font-size: 14.5px; color: var(--gray-700); }
+    .prompt-box .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); display: block; margin-bottom: 6px; }
+
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 56px; }
+    @media (max-width: 900px) { .summary { grid-template-columns: repeat(2, 1fr); } }
+    .summary .cell { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 18px 20px; }
+    .summary .k { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 6px; }
+    .summary .v { font-size: 22px; color: var(--slate); font-weight: 700; }
+    .summary .v.accent { color: var(--clay); }
+
+    .search-wrap { position: relative; margin-bottom: 40px; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    .search-input { width: 100%; max-width: 520px; padding: 11px 16px 11px 42px; border: 1.5px solid var(--gray-300); border-radius: 10px; background: var(--white); font-family: var(--sans); font-size: 14px; color: var(--slate); outline: none; transition: border-color 0.15s; }
+    .search-input:focus { border-color: var(--clay); }
+    .search-input::placeholder { color: var(--gray-500); }
+
+    .section-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 20px; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media (max-width: 1000px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+
+    .card { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
+    .card:hover { border-color: var(--clay); box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-2px); }
+    .card.hidden { display: none; }
+    .card-num { font-family: var(--mono); font-size: 11px; background: var(--oat); color: var(--slate); padding: 3px 9px; border-radius: 8px; align-self: flex-start; }
+    .card h2 { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--slate); letter-spacing: -0.01em; }
+    .card p { font-size: 13.5px; color: var(--gray-500); line-height: 1.5; flex: 1; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .card-tag { font-family: var(--mono); font-size: 10.5px; background: var(--gray-150); border: 1px solid var(--gray-300); border-radius: 5px; padding: 2px 7px; color: var(--gray-700); }
+    .card-arrow { font-size: 18px; color: var(--clay); align-self: flex-end; margin-top: 4px; }
+
+    .no-results { display: none; font-size: 14px; color: var(--gray-500); padding: 24px 0; }
+    .no-results.visible { display: block; }
+
+    .workflow-box { background: var(--slate); border-radius: 16px; padding: 28px 32px; margin-top: 56px; color: #E8E6DE; }
+    .workflow-box .wb-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); margin-bottom: 12px; display: block; }
+    .workflow-box h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; color: var(--white); margin-bottom: 10px; }
+    .workflow-box p { font-size: 14px; color: #B8B6AD; line-height: 1.6; }
+    .workflow-box code { font-family: var(--mono); font-size: 0.9em; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 1px 6px; color: #C9B98A; }
+
+    /* Claude workflow steps */
+    .claude-workflow { margin-bottom: 56px; }
+    .claude-workflow-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 20px; }
+    .wf-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 16px; overflow: hidden; }
+    @media (max-width: 900px) { .wf-steps { grid-template-columns: 1fr; } }
+    .wf-step { padding: 20px 20px 22px; border-right: 1.5px solid var(--gray-300); position: relative; transition: background .15s; }
+    .wf-step:last-child { border-right: none; }
+    @media (max-width: 900px) { .wf-step { border-right: none; border-bottom: 1.5px solid var(--gray-300); } .wf-step:last-child { border-bottom: none; } }
+    .wf-step:hover { background: var(--gray-150); }
+    .wf-num { font-family: var(--mono); font-size: 10px; color: var(--gray-500); margin-bottom: 10px; display: block; }
+    .wf-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+    .wf-step h3 { font-family: var(--serif); font-weight: 500; font-size: 16px; color: var(--slate); margin-bottom: 5px; }
+    .wf-step p { font-size: 12.5px; color: var(--gray-500); line-height: 1.5; }
+    .wf-step code { font-family: var(--mono); font-size: 0.82em; background: var(--gray-150); border: 1px solid var(--gray-300); border-radius: 3px; padding: 1px 4px; color: var(--slate); }
+    .wf-step.highlight { background: var(--oat); }
+    .wf-step.highlight:hover { background: #D8CFBF; }
+    .wf-arrow { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; background: var(--clay); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1; font-size: 9px; color: var(--white); font-weight: 700; }
+    @media (max-width: 900px) { .wf-arrow { display: none; } }
+
+    .card.featured { border-color: var(--clay); background: linear-gradient(135deg, #FFF8F5 0%, var(--white) 100%); }
+    .card.featured .card-num { background: var(--clay); color: var(--white); }
+
+    /* About this document */
+    .doc-principles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+    @media (max-width: 720px) { .doc-principles { grid-template-columns: 1fr; } }
+    .doc-principle { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 14px; padding: 22px 24px; display: flex; gap: 18px; align-items: flex-start; }
+    .doc-principle.primary { border-color: var(--clay); background: linear-gradient(135deg, #FFF8F5 0%, var(--white) 100%); }
+    .dp-num { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--clay); flex-shrink: 0; padding-top: 2px; min-width: 20px; }
+    .dp-body h3 { font-family: var(--serif); font-weight: 500; font-size: 18px; color: var(--slate); margin-bottom: 6px; letter-spacing: -0.01em; }
+    .dp-body p { font-size: 13.5px; color: var(--gray-500); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="page-head">
+      <div class="eyebrow">Engineering · Plank</div>
+      <h1>Dev Guidelines</h1>
+      <div class="prompt-box">
+        <span class="label">Recommended workflow</span>
+        Use <strong>Claude Code with worktrees</strong> for all development. Open one worktree per task, spec-first: write a spec in <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> and say <strong>run specs</strong> — the <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">programming-organizer</code> skill orchestrates CodeAgent → TestAgent → ReviewAgent automatically. Read the <a href="claude-worktrees.html" style="color:var(--clay);text-decoration:none;font-weight:600">Claude Worktrees guide</a> first.
+      </div>
+    </header>
+
+    <div class="doc-principles">
+      <div class="doc-principle primary">
+        <span class="dp-num">1</span>
+        <div class="dp-body">
+          <h3>Client architecture always wins</h3>
+          <p>When working inside a client's project, follow their existing architecture, conventions, and tooling decisions — even when they differ from this document. These guidelines are a starting point, not a mandate. Client context overrides everything here.</p>
+        </div>
+      </div>
+      <div class="doc-principle">
+        <span class="dp-num">2</span>
+        <div class="dp-body">
+          <h3>For new Plank projects &amp; good practice</h3>
+          <p>These guidelines drive new projects started by the Plank team and serve as a reference for recommended practices when advising clients. Use them to bootstrap a project with consistent, well-reasoned defaults — then adapt to the specific context.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="cell"><div class="k">Guides</div><div class="v accent">9</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">34</div></div>
+      <div class="cell"><div class="k">Stack</div><div class="v">Full-stack</div></div>
+      <div class="cell"><div class="k">Format</div><div class="v">Interactive</div></div>
+    </div>
+
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Search guides…" aria-label="Search guides">
+    </div>
+
+    <div class="claude-workflow">
+      <div class="claude-workflow-label">Claude workflow — recommended for all development</div>
+      <div class="wf-steps">
+        <div class="wf-step highlight">
+          <span class="wf-num">Step 1</span>
+          <span class="wf-icon">🪵</span>
+          <h3>Open a worktree</h3>
+          <p>One isolated checkout per task. Run <code>claude --worktree &lt;name&gt;</code> — edits never collide across sessions.</p>
+          <div class="wf-arrow">→</div>
+        </div>
+        <div class="wf-step">
+          <span class="wf-num">Step 2</span>
+          <span class="wf-icon">📋</span>
+          <h3>Write the spec</h3>
+          <p>Create <code>specs/&lt;name&gt;_&lt;date&gt;.md</code> with goal, acceptance criteria, and constraints. Or ask Claude to interview you.</p>
+          <div class="wf-arrow">→</div>
+        </div>
+        <div class="wf-step">
+          <span class="wf-num">Step 3</span>
+          <span class="wf-icon">🔍</span>
+          <h3>Explore → Plan</h3>
+          <p>Enter plan mode. Claude reads the codebase and produces an implementation plan before touching any file.</p>
+          <div class="wf-arrow">→</div>
+        </div>
+        <div class="wf-step">
+          <span class="wf-num">Step 4</span>
+          <span class="wf-icon">⚙️</span>
+          <h3>Run specs</h3>
+          <p>Say <strong>run specs</strong> — <code>programming-organizer</code> orchestrates CodeAgent → TestAgent → ReviewAgent automatically.</p>
+          <div class="wf-arrow">→</div>
+        </div>
+        <div class="wf-step">
+          <span class="wf-num">Step 5</span>
+          <span class="wf-icon">✅</span>
+          <h3>Review &amp; merge</h3>
+          <p>Open a second session as reviewer. Inspect <code>git diff main..</code>, merge, and clean up the worktree.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">All guides</div>
+
+    <div class="cards" id="cards">
+
+      <a href="claude-worktrees.html" class="card featured" data-tags="claude worktree parallel sessions terminals productivity ai agent">
+        <span class="card-num">01</span>
+        <h2>Claude Worktrees</h2>
+        <p>Start here. Run 3–5 parallel Claude sessions in isolated git worktrees — zero file collisions, asymmetric and pipeline patterns.</p>
+        <div class="card-tags">
+          <span class="card-tag">Claude Code</span>
+          <span class="card-tag">Worktrees</span>
+          <span class="card-tag">Parallel</span>
+          <span class="card-tag">★ Start here</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="skills.html" class="card" data-tags="skills claude code slash commands langchain langgraph deep-agents prisma shadcn terraform tdd clean-code expo turborepo">
+        <span class="card-num">02</span>
+        <h2>Claude Code Skills</h2>
+        <p>31 recommended skills — Plank built-ins, AI/agent builders, frontend libraries, backend tools, and code-quality helpers with when-to-invoke guidance.</p>
+        <div class="card-tags">
+          <span class="card-tag">LangGraph</span>
+          <span class="card-tag">Deep Agents</span>
+          <span class="card-tag">Shadcn</span>
+          <span class="card-tag">Prisma</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="backend.html" class="card" data-tags="typescript python fastify fastapi prisma solid architecture">
+        <span class="card-num">03</span>
+        <h2>Backend</h2>
+        <p>Layered architecture, Prisma patterns, strict TypeScript, and API design rules for Fastify and FastAPI services.</p>
+        <div class="card-tags">
+          <span class="card-tag">TypeScript</span>
+          <span class="card-tag">Python</span>
+          <span class="card-tag">Fastify</span>
+          <span class="card-tag">Prisma</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="frontend.html" class="card" data-tags="react nextjs shadcn tailwind tanstack query router component">
+        <span class="card-num">04</span>
+        <h2>Frontend</h2>
+        <p>Server components by default, TanStack Query for async state, Tailwind utility classes, and accessibility requirements.</p>
+        <div class="card-tags">
+          <span class="card-tag">React</span>
+          <span class="card-tag">Next.js</span>
+          <span class="card-tag">Shadcn/ui</span>
+          <span class="card-tag">Tailwind</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="infra.html" class="card" data-tags="terraform kubernetes helm aws gcp sentry iac devops">
+        <span class="card-num">05</span>
+        <h2>Infra / DevOps</h2>
+        <p>Terraform state management, Kubernetes resource limits, observability with Sentry and OTel, and security hardening.</p>
+        <div class="card-tags">
+          <span class="card-tag">Terraform</span>
+          <span class="card-tag">Kubernetes</span>
+          <span class="card-tag">AWS</span>
+          <span class="card-tag">GCP</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="ai-llm.html" class="card" data-tags="langchain langgraph anthropic openai gemini llm agent prompt">
+        <span class="card-num">06</span>
+        <h2>AI / LLM</h2>
+        <p>Prompts as code, typed LangGraph state, cost attribution per feature, and safety guardrails at output boundaries.</p>
+        <div class="card-tags">
+          <span class="card-tag">LangChain</span>
+          <span class="card-tag">LangGraph</span>
+          <span class="card-tag">Anthropic</span>
+          <span class="card-tag">OpenAI</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="testing.html" class="card" data-tags="unit integration e2e vitest playwright msw evals testing">
+        <span class="card-num">07</span>
+        <h2>Testing</h2>
+        <p>70/20/10 pyramid, real DB integrations, MSW for frontend mocks, Playwright for E2E, and LLM eval pipelines.</p>
+        <div class="card-tags">
+          <span class="card-tag">Vitest</span>
+          <span class="card-tag">Playwright</span>
+          <span class="card-tag">MSW</span>
+          <span class="card-tag">AI Evals</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="cicd.html" class="card" data-tags="github actions docker helm terraform ecr artifact registry deploy">
+        <span class="card-num">08</span>
+        <h2>CI / CD</h2>
+        <p>Build-once promote-everywhere, three-tier environments, rolling deploys with readiness probes, and quality gates.</p>
+        <div class="card-tags">
+          <span class="card-tag">GitHub Actions</span>
+          <span class="card-tag">Docker</span>
+          <span class="card-tag">Helm</span>
+          <span class="card-tag">Trivy</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="code-design.html" class="card" data-tags="architecture layers modules structure design solid clean code">
+        <span class="card-num">09</span>
+        <h2>Code Design</h2>
+        <p>Module slice anatomy with router, controller, service, model, and repository — plus infrastructure and shared layers.</p>
+        <div class="card-tags">
+          <span class="card-tag">Architecture</span>
+          <span class="card-tag">Modules</span>
+          <span class="card-tag">Clean Code</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>
+
+    </div>
+
+    <p class="no-results" id="no-results">No guides match your search.</p>
+
+    <div class="workflow-box">
+      <span class="wb-label">Spec-driven development</span>
+      <h2>Write the spec, Claude does the rest</h2>
+      <p>Create <code>specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> with goal, acceptance criteria, constraints, and context. Say <strong style="color:#E8E6DE">run specs</strong> and the <code>programming-organizer</code> skill orchestrates the full pipeline: CodeAgent implements, TestAgent verifies, ReviewAgent audits — you get an HTML report. Run it inside a worktree so you can ship to a PR directly without touching your main branch.</p>
+    </div>
+
+  </div>
+
+  <script>
+    const search = document.getElementById('search');
+    const cards  = document.querySelectorAll('.card');
+    const noRes  = document.getElementById('no-results');
+
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase().trim();
+      let visible = 0;
+      cards.forEach(card => {
+        const text = (card.textContent + ' ' + (card.dataset.tags || '')).toLowerCase();
+        const match = !q || text.includes(q);
+        card.classList.toggle('hidden', !match);
+        if (match) visible++;
+      });
+      noRes.classList.toggle('visible', visible === 0 && q.length > 0);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Worktrees — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    /* code block */
+    .code-wrap{margin-bottom:20px;}
+    .code-file{font-family:var(--mono);font-size:12px;color:var(--gray-500);margin-bottom:7px;}
+    .code{background:var(--slate);border-radius:12px;padding:20px 22px;overflow-x:auto;position:relative;}
+    .code pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8E6DE;white-space:pre;}
+    .code .cm{color:var(--gray-500);}
+    .code .kw{color:var(--clay);}
+    .code .str{color:var(--olive);}
+    .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;transition:background .15s,color .15s;}
+    .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+    .copy-btn.copied{color:#a8d8a8;border-color:#a8d8a8;}
+
+    /* pattern cards (workflow patterns) */
+    .pattern-tabs{display:flex;gap:0;margin-bottom:20px;border:1.5px solid var(--gray-300);border-radius:10px;overflow:hidden;}
+    .ptab{flex:1;padding:10px 8px;text-align:center;font-size:13px;color:var(--gray-500);cursor:pointer;background:var(--gray-150);border-right:1.5px solid var(--gray-300);transition:background .15s,color .15s;}
+    .ptab:last-child{border-right:none;}
+    .ptab.active{background:var(--white);color:var(--slate);font-weight:600;}
+    .pattern-content{display:none;}
+    .pattern-content.active{display:block;}
+    .pattern-box{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:20px;}
+    .pattern-box h3{font-family:var(--serif);font-weight:500;font-size:18px;color:var(--slate);margin-bottom:6px;}
+    .pattern-box p{font-size:13.5px;color:var(--gray-500);margin-bottom:14px;}
+
+    /* table */
+    .table-wrap{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--gray-150);padding:11px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);border-bottom:1.5px solid var(--gray-300);}
+    td{padding:11px 16px;font-size:13.5px;border-bottom:1px solid var(--gray-300);vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    td:not(:last-child){border-right:1px solid var(--gray-300);}
+    td code{font-family:var(--mono);font-size:.82em;}
+
+    /* milestone timeline (cleanup section) */
+    .milestones{display:flex;flex-direction:column;gap:0;}
+    .milestone{display:grid;grid-template-columns:32px 1fr;gap:0 16px;position:relative;}
+    .dot-col{display:flex;flex-direction:column;align-items:center;}
+    .dot{width:14px;height:14px;border-radius:50%;background:var(--white);border:3px solid var(--clay);margin-top:4px;flex-shrink:0;}
+    .dot.done{background:var(--olive);border-color:var(--olive);}
+    .line{width:2px;flex:1;background:var(--gray-300);margin:4px 0;}
+    .milestone:last-child .line{display:none;}
+    .mil-body{padding-bottom:28px;}
+    .mil-body h3{font-family:var(--serif);font-weight:500;font-size:17px;color:var(--slate);margin-bottom:4px;}
+    .mil-body p{font-size:13.5px;color:var(--gray-500);max-width:580px;}
+    .mil-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+    .mil-tag{font-family:var(--mono);font-size:11px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:5px;padding:2px 7px;color:var(--gray-700);}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Claude Worktrees</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Tooling · Claude Code</div>
+    <h1>Parallel Workflows with Worktrees</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Concept</div><div class="v">Isolated checkout</div></div>
+      <div class="cell"><div class="k">Max parallel</div><div class="v accent">3–5</div></div>
+      <div class="cell"><div class="k">Patterns</div><div class="v">4</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">8</div></div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Quick Start</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Workflow Patterns</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Terminal Setup</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Local Config</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Subagent Isolation</a></li>
+        <li><a href="#s06" class="nav-link"><span class="nav-num">06</span> Cleanup</a></li>
+        <li><a href="#s07" class="nav-link"><span class="nav-num">07</span> Context Management</a></li>
+        <li><a href="#s08" class="nav-link"><span class="nav-num">08</span> When to Use</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Quick Start</h2></div>
+        <p class="sec-intro">Each <code>claude --worktree &lt;name&gt;</code> creates a fresh git checkout under <code>.claude/worktrees/&lt;name&gt;/</code> on a new branch — edits in one session never touch files in another.</p>
+
+        <div class="code-wrap">
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm"># Accept workspace trust once (required before first --worktree use)</span>
+claude
+
+<span class="cm"># Parallel session on a new branch</span>
+claude --worktree feature-auth
+
+<span class="cm"># Second session in another terminal</span>
+claude --worktree bugfix-123
+
+<span class="cm"># Branch from a specific PR</span>
+claude --worktree <span class="str">"#1234"</span>
+
+<span class="cm"># Auto-generated name (e.g. bright-running-fox)</span>
+claude --worktree</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Add <code>.claude/worktrees/</code> to <code>.gitignore</code> so worktree contents don't appear as untracked files in the main checkout.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">By default worktrees branch from <code>origin/HEAD</code> (clean remote state). Set <code>worktree.baseRef: "head"</code> in settings to branch from local HEAD instead.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">After creating a worktree, install dependencies in it before running code (<code>npm install</code>, <code>pip install</code>, etc.).</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>Workflow Patterns</h2></div>
+        <p class="sec-intro">Four proven patterns — choose by how much coordination you need between sessions.</p>
+
+        <div class="pattern-tabs">
+          <div class="ptab active" onclick="switchTab(0)">Parallel</div>
+          <div class="ptab" onclick="switchTab(1)">Asymmetric</div>
+          <div class="ptab" onclick="switchTab(2)">Pipeline</div>
+          <div class="ptab" onclick="switchTab(3)">Writer/Reviewer</div>
+        </div>
+
+        <div class="pattern-content active">
+          <div class="pattern-box">
+            <h3>Parallel Feature Development</h3>
+            <p>One terminal per worktree, each on its own branch. Zero interference — every session edits its own files.</p>
+            <div class="code-wrap" style="margin-bottom:0">
+              <div class="code">
+                <button class="copy-btn">Copy</button>
+                <pre>Terminal A: claude --worktree feature-payments
+Terminal B: claude --worktree feature-notifications
+Terminal C: claude --worktree bugfix-auth-timeout</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pattern-content">
+          <div class="pattern-box">
+            <h3>Asymmetric (you + one agent)</h3>
+            <p>You edit in the main checkout; one agent works autonomously in a worktree. Neither waits on the other.</p>
+            <div class="code-wrap" style="margin-bottom:0">
+              <div class="code">
+                <button class="copy-btn">Copy</button>
+                <pre>Main terminal:  <span class="cm"># code normally in repo root</span>
+Terminal B:     claude --worktree refactor-dal   <span class="cm"># runs unattended</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pattern-content">
+          <div class="pattern-box">
+            <h3>Research → Implementation Pipeline</h3>
+            <p>Three overlapping phases, each isolated. Start implementation as soon as the spec is stable enough — phases can run concurrently.</p>
+            <div class="table-wrap" style="margin-top:14px;margin-bottom:0">
+              <table>
+                <thead><tr><th>Worktree</th><th>Role</th><th>Task</th></tr></thead>
+                <tbody>
+                  <tr><td><code>research</code></td><td>Explorer</td><td>Reads codebase, produces <code>SPEC.md</code></td></tr>
+                  <tr><td><code>impl</code></td><td>Builder</td><td>Reads <code>SPEC.md</code>, writes code</td></tr>
+                  <tr><td>main checkout</td><td>Reviewer</td><td>Merges, reviews diff, opens PR</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="pattern-content">
+          <div class="pattern-box">
+            <h3>Writer / Reviewer</h3>
+            <p>Two sessions for unbiased review — the reviewer never wrote the code, so it evaluates the result independently.</p>
+            <div class="code-wrap" style="margin-bottom:0">
+              <div class="code">
+                <button class="copy-btn">Copy</button>
+                <pre>Session A: claude --worktree impl-rate-limiter
+           → <span class="str">"implement rate limiting for our API"</span>
+
+Session B: claude --worktree review-rate-limiter
+           → <span class="str">"review @src/middleware/rateLimiter.ts for edge cases,
+              race conditions, and consistency with existing middleware"</span>
+
+Session A: <span class="str">"address this review feedback: [paste Session B output]"</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Terminal Setup</h2></div>
+        <p class="sec-intro">Choose the terminal setup that fits the number of parallel sessions you're running.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Setup</th><th>When to use</th></tr></thead>
+            <tbody>
+              <tr><td>Multiple tabs/windows</td><td>2–3 sessions; fast to start, no setup required</td></tr>
+              <tr><td><code>tmux</code> panes</td><td>3+ sessions; watch all simultaneously on one screen</td></tr>
+              <tr><td>Claude desktop app</td><td>GUI — creates worktrees automatically per new session</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-file">tmux quick reference</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>tmux new-session -s work    <span class="cm"># new session named "work"</span>
+Ctrl+b %                    <span class="cm"># split pane vertically</span>
+Ctrl+b "                    <span class="cm"># split pane horizontally</span>
+Ctrl+b arrow                <span class="cm"># navigate between panes</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>Copy Local Config into Worktrees</h2></div>
+        <p class="sec-intro">Worktrees are fresh checkouts — <code>.env</code> and similar gitignored files are absent. Use <code>.worktreeinclude</code> to copy them automatically.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">.worktreeinclude (gitignore syntax)</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>.env
+.env.local
+config/secrets.json</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Only files that match <em>and</em> are gitignored are copied — tracked files are never duplicated.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Applies to <code>--worktree</code> sessions, subagent worktrees, and desktop parallel sessions.</span></li>
+        </ul>
+      </section>
+
+      <section id="s05">
+        <div class="sec-head"><span class="num">05</span><h2>Subagent Isolation</h2></div>
+        <p class="sec-intro">Subagents can each run in their own worktree so parallel edits don't conflict. Set it per-agent or ask Claude at runtime.</p>
+
+        <div class="code-wrap">
+          <div class="code-file">.claude/agents/security-reviewer.md</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>---
+<span class="kw">name:</span> security-reviewer
+<span class="kw">description:</span> Reviews code for security vulnerabilities
+<span class="kw">tools:</span> Read, Grep, Glob, Bash
+<span class="kw">isolation:</span> worktree       <span class="cm"># each subagent gets its own worktree</span>
+---</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Subagent worktrees are removed automatically when the subagent finishes with no uncommitted changes.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Subagent worktrees branch from the same base as <code>--worktree</code> (respects <code>worktree.baseRef</code> setting).</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Ask Claude at runtime: <em>"use worktrees for your agents"</em> instead of setting frontmatter.</span></li>
+        </ul>
+      </section>
+
+      <section id="s06">
+        <div class="sec-head"><span class="num">06</span><h2>Cleanup</h2></div>
+        <p class="sec-intro">Cleanup behavior depends on whether the session made any changes. Non-interactive runs never auto-clean.</p>
+
+        <div class="milestones">
+          <div class="milestone">
+            <div class="dot-col"><span class="dot done"></span><span class="line"></span></div>
+            <div class="mil-body">
+              <h3>No changes</h3>
+              <p>Worktree and branch removed automatically on exit.</p>
+              <div class="mil-tags"><span class="mil-tag">auto cleanup</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="dot-col"><span class="dot"></span><span class="line"></span></div>
+            <div class="mil-body">
+              <h3>Uncommitted changes or new commits</h3>
+              <p>Claude prompts: keep (preserves directory + branch) or remove (deletes both, discards commits).</p>
+              <div class="mil-tags"><span class="mil-tag">prompted</span></div>
+            </div>
+          </div>
+          <div class="milestone">
+            <div class="dot-col"><span class="dot"></span></div>
+            <div class="mil-body">
+              <h3>Non-interactive (<code>-p</code> flag)</h3>
+              <p>No cleanup prompt. Remove manually with <code>git worktree remove</code>.</p>
+              <div class="mil-tags"><span class="mil-tag">manual</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>git worktree list                           <span class="cm"># inspect all worktrees</span>
+git worktree remove .claude/worktrees/foo   <span class="cm"># manual removal</span>
+git worktree remove --force ...             <span class="cm"># discard uncommitted changes</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="s07">
+        <div class="sec-head"><span class="num">07</span><h2>Context Management</h2></div>
+        <p class="sec-intro">Context window is the most important resource. Keep each session focused — clear between unrelated tasks.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>/clear</code> between unrelated tasks within a session — long context degrades performance.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>claude --continue</code> to resume the most recent session; <code>claude --resume</code> to pick from a list.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>/compact</code> or <code>Esc+Esc → Summarize</code> when context fills mid-task.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Delegate exploratory reads to a subagent so main session context stays clean.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Always inspect the full diff before merging: <code>git diff main..worktree-feature-auth</code> — catch scope creep at diff time, not in prod.</span></li>
+        </ul>
+      </section>
+
+      <section id="s08">
+        <div class="sec-head"><span class="num">08</span><h2>When to Use Worktrees</h2></div>
+        <p class="sec-intro">Practical upper bound is 3–5 concurrent worktrees. Beyond that, use CI or agent orchestration.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Use worktrees</th><th>Skip worktrees</th></tr></thead>
+            <tbody>
+              <tr><td>Tasks are independent</td><td>Tasks share state or depend on each other</td></tr>
+              <tr><td>Long-running agent work</td><td>Quick one-liner fix</td></tr>
+              <tr><td>You want unbiased review</td><td>Single-file change</td></tr>
+              <tr><td>Parallel feature branches</td><td>Sequential pipeline stages</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  // Scroll spy
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  // Search
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+
+  // Pattern tabs
+  const tabs = document.querySelectorAll('.ptab');
+  const contents = document.querySelectorAll('.pattern-content');
+  function switchTab(i) {
+    tabs.forEach((t, j) => t.classList.toggle('active', i === j));
+    contents.forEach((c, j) => c.classList.toggle('active', i === j));
+  }
+
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(block => {
+    const btn = block.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const text = block.querySelector('pre').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  });
+</script>
+</body>
+</html>

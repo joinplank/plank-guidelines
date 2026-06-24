@@ -1,0 +1,234 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backend — Plank Dev Guidelines</title>
+  <style>
+    :root {
+      --ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;
+      --gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;
+      --serif:ui-serif,Georgia,'Times New Roman',serif;
+      --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+
+    .code-wrap{position:relative;margin-bottom:16px;}
+    .code-file{font-family:var(--mono);font-size:12px;color:var(--gray-500);margin-bottom:8px;}
+    .code{background:var(--slate);border-radius:12px;padding:20px 22px;overflow-x:auto;position:relative;}
+    .code pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8E6DE;white-space:pre;}
+    .code .cm{color:var(--gray-500);}
+    .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;transition:background .15s,color .15s;}
+    .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+    .copy-btn.copied{color:#a8d8a8;border-color:#a8d8a8;}
+
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .tag{font-family:var(--mono);font-size:11.5px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:6px;padding:3px 10px;color:var(--gray-700);}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb">
+    <a href="index.html">Plank Guidelines</a><span>›</span>Backend
+  </div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Backend</div>
+    <h1>Backend Guidelines</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Stack</div><div class="v">TS · Python</div></div>
+      <div class="cell"><div class="k">Framework</div><div class="v">Fastify · FastAPI</div></div>
+      <div class="cell"><div class="k">ORM</div><div class="v accent">Prisma</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">4</div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">TypeScript</span><span class="tag">Python</span><span class="tag">Fastify</span>
+      <span class="tag">FastAPI</span><span class="tag">Prisma</span><span class="tag">SOLID</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Architecture</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Prisma / Data</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Code Quality</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> APIs</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Architecture</h2></div>
+        <p class="sec-intro">Simple, consistent layered structure over strict Clean Architecture. Each module owns its own slice — no cross-cutting concerns.</p>
+        <div class="code-wrap">
+          <div class="code-file">Module structure</div>
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre>application/
+  &lt;module&gt;/
+    &lt;module&gt;.router.ts        <span class="cm"># route definitions</span>
+    &lt;module&gt;.controller.ts    <span class="cm"># request/response handling</span>
+    &lt;module&gt;.service.ts       <span class="cm"># business logic</span>
+    &lt;module&gt;.model.ts         <span class="cm"># types / schemas</span>
+    &lt;module&gt;.repository.ts    <span class="cm"># DB access for this module</span>
+infrastructure/
+  tools/                      <span class="cm"># agent tools (io, search, fetch…)</span>
+  database/                   <span class="cm"># shared DB client / base repository</span>
+  providers/                  <span class="cm"># external services (S3, Resend, Sentry, Auth0…)</span>
+shared/
+  utils/                      <span class="cm"># pure helpers (date, string…)</span>
+  config/                     <span class="cm"># DI container and app config</span></pre>
+          </div>
+        </div>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Business logic lives in the service layer — controllers only parse input and format output.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Repositories abstract all DB access; services never call Prisma directly.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Infrastructure providers are injected, not imported directly in services.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep modules self-contained; cross-module calls go service → service, never repository → repository.</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>Prisma / Data</h2></div>
+        <p class="sec-intro">Typed access, version-controlled migrations, and transactional integrity on every multi-step write.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Always use the typed generated Prisma client — never raw SQL unless for performance with profiled evidence.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Migrations in version control; never run <code>db push</code> in production.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Transactions for multi-step writes; never leave partial state on failure.</span></li>
+        </ul>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Code Quality</h2></div>
+        <p class="sec-intro">Strict types everywhere — no escape hatches without justification.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Strict TypeScript: <code>noImplicitAny</code>, <code>strictNullChecks</code>. No <code>any</code> without a comment explaining why.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Python: type hints everywhere, Pydantic for validation at boundaries.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">No business logic in route handlers — delegate to the service layer.</span></li>
+        </ul>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>APIs</h2></div>
+        <p class="sec-intro">Validate at the boundary, fail consistently, version from day one.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Validate all inputs at the boundary (Zod for TS, Pydantic for Python) before entering services.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Consistent error envelope: <code>&#123; error: &#123; code, message, details &#125; &#125;</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Version APIs from day one (<code>/v1/</code>); never break existing contracts.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Rate-limit and auth middleware applied at router level, not inside handlers.</span></li>
+        </ul>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(block => {
+    const btn = block.querySelector('.copy-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const text = block.querySelector('pre').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    });
+  });
+
+  // Scroll spy
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  // Search
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>
