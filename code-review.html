@@ -1,0 +1,343 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Review — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+
+    .code-wrap{margin-bottom:20px;}
+    .code-file{font-family:var(--mono);font-size:12px;color:var(--gray-500);margin-bottom:7px;}
+    .code{background:var(--slate);border-radius:12px;padding:20px 22px;overflow-x:auto;position:relative;}
+    .code pre{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#E8E6DE;white-space:pre;}
+    .code .cm{color:var(--gray-500);}
+    .code .kw{color:var(--clay);}
+    .code .str{color:var(--olive);}
+    .copy-btn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;transition:background .15s,color .15s;}
+    .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+    .copy-btn.copied{color:#a8d8a8;border-color:#a8d8a8;}
+
+    .table-wrap{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:var(--gray-150);padding:11px 16px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--slate);border-bottom:1.5px solid var(--gray-300);}
+    td{padding:11px 16px;font-size:13.5px;border-bottom:1px solid var(--gray-300);vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    td:not(:last-child){border-right:1px solid var(--gray-300);}
+    td code{font-family:var(--mono);font-size:.82em;}
+
+    .callout{background:var(--white);border:1.5px solid var(--gray-300);border-left:4px solid var(--clay);border-radius:10px;padding:14px 18px;font-size:13.5px;color:var(--gray-700);margin-bottom:20px;line-height:1.6;}
+    .callout strong{color:var(--slate);}
+
+    .effort-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    @media(max-width:900px){.effort-grid{grid-template-columns:1fr;}}
+    .effort-cell{padding:18px 16px;border-right:1.5px solid var(--gray-300);}
+    .effort-cell:last-child{border-right:none;}
+    @media(max-width:900px){.effort-cell{border-right:none;border-bottom:1.5px solid var(--gray-300);}
+    .effort-cell:last-child{border-bottom:none;}}
+    .effort-cell.ultra{background:linear-gradient(135deg,#FFF8F5 0%,var(--white) 100%);}
+    .effort-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:8px;}
+    .effort-name{font-family:var(--serif);font-weight:500;font-size:16px;color:var(--slate);margin-bottom:6px;}
+    .effort-desc{font-size:12.5px;color:var(--gray-500);line-height:1.5;}
+    .effort-badge{display:inline-block;font-family:var(--mono);font-size:10px;background:var(--oat);color:var(--slate);border-radius:5px;padding:2px 7px;margin-top:8px;}
+    .effort-badge.hot{background:var(--clay);color:var(--white);}
+
+    .cmd-row{display:flex;align-items:center;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;margin-bottom:8px;}
+    .cmd-tag{font-family:var(--mono);font-size:12px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:5px;padding:3px 9px;color:var(--slate);white-space:nowrap;flex-shrink:0;}
+    .cmd-desc{font-size:13.5px;color:var(--gray-700);line-height:1.5;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Claude Code Review</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Tooling · Claude Code</div>
+    <h1>Code Review with Claude</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Primary command</div><div class="v accent">/code-review</div></div>
+      <div class="cell"><div class="k">Effort levels</div><div class="v">5</div></div>
+      <div class="cell"><div class="k">Cloud mode</div><div class="v">ultra</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">6</div></div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Overview</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Effort Levels</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Flags</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Ultra Review</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Simplify</a></li>
+        <li><a href="#s06" class="nav-link"><span class="nav-num">06</span> Workflow</a></li>
+      </ul>
+    </aside>
+
+    <main>
+
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Overview</h2></div>
+        <p class="sec-intro">The <code>/code-review</code> skill reviews the current working diff for correctness bugs and reuse, simplification, and efficiency cleanups. Findings are structured and scoped to what actually changed.</p>
+
+        <div class="code-wrap">
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm"># Review current diff at default effort</span>
+/code-review
+
+<span class="cm"># Specify effort level</span>
+/code-review low
+/code-review high
+/code-review ultra
+
+<span class="cm"># Review a GitHub PR by number</span>
+/code-review ultra 42
+
+<span class="cm"># Post findings as inline PR comments</span>
+/code-review --comment
+
+<span class="cm"># Apply findings directly to working tree</span>
+/code-review --fix</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Always run <code>/code-review</code> before opening a PR — it catches issues that tests can't surface, like logic bugs, dead code, and missed edge cases.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">The review operates on your <em>working diff</em> (uncommitted changes against the base branch), not the full file. Keep that diff focused.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Requires a git repository. If you're not in one, run <code>git init</code> first.</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>Effort Levels</h2></div>
+        <p class="sec-intro">Five levels trade off speed against coverage. Default is <strong>medium</strong> when no level is specified. Higher levels cast a wider net but may include uncertain findings.</p>
+
+        <div class="effort-grid">
+          <div class="effort-cell">
+            <div class="effort-label">Level 1</div>
+            <div class="effort-name">low</div>
+            <div class="effort-desc">High-confidence correctness bugs only. Fast — good for a quick sanity check before committing.</div>
+            <span class="effort-badge">fast</span>
+          </div>
+          <div class="effort-cell">
+            <div class="effort-label">Level 2</div>
+            <div class="effort-name">medium</div>
+            <div class="effort-desc">Correctness bugs plus clear reuse and simplification opportunities. The default effort.</div>
+            <span class="effort-badge">default</span>
+          </div>
+          <div class="effort-cell">
+            <div class="effort-label">Level 3</div>
+            <div class="effort-name">high</div>
+            <div class="effort-desc">Broader coverage — includes findings the model is less certain about. Good for pre-PR review of complex diffs.</div>
+            <span class="effort-badge">thorough</span>
+          </div>
+          <div class="effort-cell">
+            <div class="effort-label">Level 4</div>
+            <div class="effort-name">max</div>
+            <div class="effort-desc">Exhaustive single-agent scan. May flag uncertain patterns. Best used on security-sensitive or high-risk changes.</div>
+            <span class="effort-badge">exhaustive</span>
+          </div>
+          <div class="effort-cell ultra">
+            <div class="effort-label">Level 5</div>
+            <div class="effort-name">ultra</div>
+            <div class="effort-desc">Deep multi-agent cloud review. Multiple reviewers collaborate and reconcile findings. Billed separately.</div>
+            <span class="effort-badge hot">cloud</span>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use <code>low</code> or <code>medium</code> for routine changes. Reserve <code>high</code>/<code>max</code> for diffs touching authentication, payments, or data migrations.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Higher effort means more findings — not that every finding is actionable. Apply engineering judgment before acting on uncertain ones.</span></li>
+        </ul>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Flags</h2></div>
+        <p class="sec-intro">Two optional flags change what happens with the findings after the review completes.</p>
+
+        <div class="cmd-row">
+          <span class="cmd-tag">--comment</span>
+          <span class="cmd-desc">Post findings as <strong>inline comments on the GitHub PR</strong>. Requires a GitHub remote and an open PR for the current branch. Useful for async review workflows where teammates need to see findings in the PR interface.</span>
+        </div>
+        <div class="cmd-row">
+          <span class="cmd-tag">--fix</span>
+          <span class="cmd-desc"><strong>Apply findings directly to the working tree.</strong> Claude makes the edits it would recommend, so you can review the diff yourself before staging. Does not commit — you retain full control.</span>
+        </div>
+
+        <div class="callout">
+          <strong>Flags combine with effort levels.</strong> For example: <code>/code-review high --comment</code> runs a high-effort review and posts the findings as PR comments.
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">With <code>--fix</code>, always review the resulting diff before committing — the model edits what it's confident about, but you own the final code.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">With <code>--comment</code>, findings appear as line-level PR comments. Resolve or dismiss them before merging.</span></li>
+        </ul>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>Ultra Review</h2></div>
+        <p class="sec-intro">Ultra launches a multi-agent cloud review. Multiple independent agents analyse the diff and reconcile their findings, producing higher-confidence results than a single-pass review.</p>
+
+        <div class="code-wrap">
+          <div class="code">
+            <button class="copy-btn">Copy</button>
+            <pre><span class="cm"># Review the current branch (bundles local diff — no GitHub remote needed)</span>
+/code-review ultra
+
+<span class="cm"># Review a specific GitHub PR</span>
+/code-review ultra 42
+
+<span class="cm"># Review with inline PR comments posted</span>
+/code-review ultra --comment</pre>
+          </div>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Ultra is user-triggered and billed separately — it cannot be launched automatically by Claude or from a hook.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">The no-argument form (<code>/code-review ultra</code>) bundles the local branch and does not require a GitHub remote.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use ultra for PRs that are large, touch multiple subsystems, or require a second opinion before merging to main.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text"><code>/ultrareview</code> is a deprecated alias for <code>/code-review ultra</code> — prefer the new form.</span></li>
+        </ul>
+      </section>
+
+      <section id="s05">
+        <div class="sec-head"><span class="num">05</span><h2>Simplify</h2></div>
+        <p class="sec-intro"><code>/simplify</code> is a focused companion to <code>/code-review</code>. It looks only at quality — reuse, simplification, efficiency, and altitude — and applies fixes directly. It does not hunt for bugs.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Command</th><th>Finds bugs</th><th>Quality cleanups</th><th>Auto-applies fixes</th></tr></thead>
+            <tbody>
+              <tr><td><code>/code-review</code></td><td>Yes</td><td>Yes</td><td>With <code>--fix</code></td></tr>
+              <tr><td><code>/simplify</code></td><td>No</td><td>Yes — primary focus</td><td>Always</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Run <code>/simplify</code> after <code>/code-review --fix</code> to catch cleanup opportunities the bug-focused pass may have missed.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Do not rely on <code>/simplify</code> alone for correctness — it intentionally skips bug detection.</span></li>
+        </ul>
+      </section>
+
+      <section id="s06">
+        <div class="sec-head"><span class="num">06</span><h2>Recommended Workflow</h2></div>
+        <p class="sec-intro">Integrate code review into your existing spec-driven workflow. The review step sits between implementation and the PR, not after it.</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Stage</th><th>Command</th><th>When</th></tr></thead>
+            <tbody>
+              <tr><td>During implementation</td><td><code>/code-review low</code></td><td>Quick correctness check after completing a subtask</td></tr>
+              <tr><td>Before opening a PR</td><td><code>/code-review high</code></td><td>Full review of the complete diff; apply or address findings</td></tr>
+              <tr><td>After applying fixes</td><td><code>/simplify</code></td><td>Quality pass to reduce noise and consolidate code</td></tr>
+              <tr><td>For complex or high-risk PRs</td><td><code>/code-review ultra</code></td><td>Multi-agent deep review before merging to main</td></tr>
+              <tr><td>Async team review</td><td><code>/code-review --comment</code></td><td>Post findings directly on GitHub so teammates see them inline</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <strong>Worktree tip:</strong> when using the <a href="claude-worktrees.html" style="color:var(--clay);text-decoration:none;font-weight:600">Writer/Reviewer pattern</a>, open a second Claude session in a fresh worktree and run <code>/code-review high</code> there. Because that session never wrote the code, its review is unbiased.
+        </div>
+
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Code review and tests serve different purposes — tests verify correctness against specs; review surfaces design issues, dead code, and subtle bugs that tests don't cover. Run both.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Address or explicitly dismiss every high-confidence finding before merging. Leaving findings open without a comment creates ambiguity for future readers.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">For security-sensitive diffs (auth, payments, RLS policies), use <code>/code-review max</code> or <code>ultra</code> — the extra coverage is worth the time.</span></li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  const search = document.getElementById('search');
+  const items  = document.querySelectorAll('.rule-item');
+  const noRes  = document.querySelector('.no-results');
+
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let visible = 0;
+    items.forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+    if (noRes) noRes.classList.toggle('visible', visible === 0 && q.length > 0);
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.closest('.code').querySelector('pre');
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+  });
+</script>
+</body>
+</html>
