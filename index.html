@@ -109,7 +109,7 @@
       <h1>Dev Guidelines</h1>
       <div class="prompt-box">
         <span class="label">Recommended workflow</span>
-        Use <strong>Claude Code with worktrees</strong> for all development. Open one worktree per task, spec-first: write a spec in <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> and say <strong>run specs</strong> — the <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">programming-organizer</code> skill orchestrates CodeAgent → TestAgent → ReviewAgent automatically. Read the <a href="claude-worktrees.html" style="color:var(--clay);text-decoration:none;font-weight:600">Claude Worktrees guide</a> first.
+        Use <strong>Claude Code with worktrees</strong> for all development. Open one worktree per task. For <strong>new features</strong>, consider writing a spec in <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> and saying <strong>run specs</strong> — the <code style="font-family:ui-monospace,'SF Mono',monospace;font-size:0.9em;background:#E3DACC;border-radius:4px;padding:1px 6px;color:#141413">programming-organizer</code> skill orchestrates CodeAgent → TestAgent → ReviewAgent automatically. <strong>Skip the spec for bug fixes and small tasks</strong> — work directly in the worktree instead. Read the <a href="claude-worktrees.html" style="color:var(--clay);text-decoration:none;font-weight:600">Claude Worktrees guide</a> first.
       </div>
     </header>
 
@@ -146,7 +146,7 @@
     </div>
 
     <div class="claude-workflow">
-      <div class="claude-workflow-label">Claude workflow — recommended for all development</div>
+      <div class="claude-workflow-label">Claude workflow — recommended for feature development</div>
       <div class="wf-steps">
         <div class="wf-step highlight">
           <span class="wf-num">Step 1</span>
@@ -159,7 +159,7 @@
           <span class="wf-num">Step 2</span>
           <span class="wf-icon">📋</span>
           <h3>Write the spec</h3>
-          <p>Create <code>specs/&lt;name&gt;_&lt;date&gt;.md</code> with goal, acceptance criteria, and constraints. Or ask Claude to interview you.</p>
+          <p>For new features: create <code>specs/&lt;name&gt;_&lt;date&gt;.md</code> with goal, acceptance criteria, and constraints. Skip for bug fixes and small tasks.</p>
           <div class="wf-arrow">→</div>
         </div>
         <div class="wf-step">
@@ -173,7 +173,7 @@
           <span class="wf-num">Step 4</span>
           <span class="wf-icon">⚙️</span>
           <h3>Run specs</h3>
-          <p>Say <strong>run specs</strong> — <code>programming-organizer</code> orchestrates CodeAgent → TestAgent → ReviewAgent automatically.</p>
+          <p>For feature work: say <strong>run specs</strong> — <code>programming-organizer</code> orchestrates CodeAgent → TestAgent → ReviewAgent automatically.</p>
           <div class="wf-arrow">→</div>
         </div>
         <div class="wf-step">
@@ -336,9 +336,9 @@
     <p class="no-results" id="no-results">No guides match your search.</p>
 
     <div class="workflow-box">
-      <span class="wb-label">Spec-driven development</span>
+      <span class="wb-label">Spec-driven development — recommended for new features</span>
       <h2>Write the spec, Claude does the rest</h2>
-      <p>Create <code>specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> with goal, acceptance criteria, constraints, and context. Say <strong style="color:#E8E6DE">run specs</strong> and the <code>programming-organizer</code> skill orchestrates the full pipeline: CodeAgent implements, TestAgent verifies, ReviewAgent audits — you get an HTML report. Run it inside a worktree so you can ship to a PR directly without touching your main branch.</p>
+      <p>For new feature development, consider writing a spec: create <code>specs/&lt;name&gt;_&lt;YYYY-MM-DD&gt;.md</code> with goal, acceptance criteria, constraints, and context. Say <strong style="color:#E8E6DE">run specs</strong> and the <code>programming-organizer</code> skill orchestrates the full pipeline: CodeAgent implements, TestAgent verifies, ReviewAgent audits — you get an HTML report. Run it inside a worktree so you can ship to a PR directly without touching your main branch. For bug fixes, skip the spec and work directly in the worktree.</p>
     </div>
 
   </div>
