@@ -1,0 +1,255 @@
+<!-- Copyright 2026 Plank · SPDX-License-Identifier: Apache-2.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile — Plank Dev Guidelines</title>
+  <style>
+    :root{--ivory:#FAF9F5;--slate:#141413;--clay:#D97757;--oat:#E3DACC;--olive:#788C5D;--gray-150:#F0EEE6;--gray-300:#D1CFC5;--gray-500:#87867F;--gray-700:#3D3D3A;--white:#FFFFFF;--serif:ui-serif,Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,'SF Mono',Menlo,Monaco,monospace;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--sans);background:var(--ivory);color:var(--gray-700);line-height:1.55;padding:40px 32px 120px;-webkit-font-smoothing:antialiased;}
+    .page{max-width:1200px;margin:0 auto;}
+    .layout{display:grid;grid-template-columns:200px 1fr;gap:56px;}
+    @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}}
+    .breadcrumb{font-size:13px;color:var(--gray-500);margin-bottom:32px;}
+    .breadcrumb a{color:var(--gray-500);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--clay);}
+    .breadcrumb span{margin:0 6px;}
+    header.page-head{margin-bottom:40px;}
+    .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:12px;}
+    h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.15;color:var(--slate);margin-bottom:16px;letter-spacing:-.01em;}
+    .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:720px){.summary{grid-template-columns:repeat(2,1fr);}}
+    .cell{background:var(--white);border:1.5px solid var(--gray-300);border-radius:12px;padding:16px 18px;}
+    .k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:5px;}
+    .v{font-size:15px;color:var(--slate);font-weight:600;}
+    .v.accent{color:var(--clay);}
+    .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .tag{font-family:var(--mono);font-size:11.5px;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:6px;padding:3px 10px;color:var(--gray-700);}
+    .search-wrap{position:relative;margin-bottom:0;}
+    .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;}
+    .search-input{width:100%;max-width:460px;padding:10px 16px 10px 40px;border:1.5px solid var(--gray-300);border-radius:10px;background:var(--white);font-family:var(--sans);font-size:14px;color:var(--slate);outline:none;transition:border-color .15s;}
+    .search-input:focus{border-color:var(--clay);}
+    .search-input::placeholder{color:var(--gray-500);}
+    .sidebar{position:sticky;top:32px;height:fit-content;}
+    .sidebar-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-bottom:12px;}
+    .nav-list{list-style:none;display:flex;flex-direction:column;gap:2px;}
+    .nav-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-700);text-decoration:none;transition:background .15s,color .15s;}
+    .nav-link:hover{background:var(--gray-150);color:var(--slate);}
+    .nav-link.active{background:var(--oat);color:var(--slate);font-weight:600;}
+    .nav-num{font-family:var(--mono);font-size:10px;color:var(--gray-500);}
+    .nav-link.active .nav-num{color:var(--clay);}
+    .nav-divider{height:1px;background:var(--gray-300);margin:8px 0;}
+    .nav-back{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--gray-500);text-decoration:none;margin-bottom:16px;}
+    .nav-back:hover{color:var(--clay);}
+    section{margin-bottom:72px;scroll-margin-top:24px;}
+    .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;}
+    .sec-head .num{font-family:var(--mono);font-size:12px;background:var(--oat);color:var(--slate);padding:3px 9px;border-radius:8px;}
+    .sec-head h2{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--slate);letter-spacing:-.01em;}
+    .sec-intro{font-size:14.5px;color:var(--gray-500);max-width:680px;margin-bottom:20px;}
+    .rules-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .rule-item{display:flex;gap:12px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--gray-700);transition:border-color .15s;}
+    .rule-item:hover{border-color:var(--clay);}
+    .rule-marker{color:var(--clay);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px;}
+    .rule-text{flex:1;line-height:1.5;}
+    .rule-item.hidden{display:none;}
+    code{font-family:var(--mono);font-size:.85em;background:var(--gray-150);border:1px solid var(--gray-300);border-radius:4px;padding:1px 5px;color:var(--slate);}
+    .no-results{display:none;font-size:14px;color:var(--gray-500);padding:20px 0;}
+    .no-results.visible{display:block;}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Plank Guidelines</a><span>›</span>Mobile</div>
+
+  <header class="page-head">
+    <div class="eyebrow">Engineering · Mobile</div>
+    <h1>Mobile Guidelines</h1>
+    <div class="summary">
+      <div class="cell"><div class="k">Frameworks</div><div class="v">Flutter + RN</div></div>
+      <div class="cell"><div class="k">Platforms</div><div class="v">iOS · Android</div></div>
+      <div class="cell"><div class="k">Languages</div><div class="v accent">Dart / TypeScript</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">10</div></div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">React Native</span><span class="tag">Flutter</span><span class="tag">Expo</span>
+      <span class="tag">Dart</span><span class="tag">TypeScript</span><span class="tag">TanStack Query</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="#87867F" stroke-width="1.5"/>
+        <path d="M10.5 10.5 L14 14" stroke="#87867F" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="search-input" id="search" placeholder="Filter rules…">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="index.html" class="nav-back">← All guides</a>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Contents</div>
+      <ul class="nav-list">
+        <li><a href="#s01" class="nav-link"><span class="nav-num">01</span> Stack Choice &amp; Architecture</a></li>
+        <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> State Management</a></li>
+        <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Navigation</a></li>
+        <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Networking &amp; Data</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Native Modules &amp; Platform APIs</a></li>
+        <li><a href="#s06" class="nav-link"><span class="nav-num">06</span> Performance &amp; List Rendering</a></li>
+        <li><a href="#s07" class="nav-link"><span class="nav-num">07</span> Offline &amp; Local Storage</a></li>
+        <li><a href="#s08" class="nav-link"><span class="nav-num">08</span> Accessibility</a></li>
+        <li><a href="#s09" class="nav-link"><span class="nav-num">09</span> Testing</a></li>
+        <li><a href="#s10" class="nav-link"><span class="nav-num">10</span> Build, Release &amp; CI</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <section id="s01">
+        <div class="sec-head"><span class="num">01</span><h2>Stack Choice &amp; Architecture</h2></div>
+        <p class="sec-intro">Pick a framework deliberately, then layer it.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Default to React Native + Expo when the team already ships React/TypeScript web (shared mental model, shared types with backend) — see the Frontend guide.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Choose Flutter when the app is UI-heavy, needs pixel-identical cross-platform rendering, or the team has Dart depth.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Layered architecture mirrors <code>code-design.html</code>: UI → state/view-model → service/repository → data source. No business logic in widgets/screens.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text"><code>RN</code> feature-folder structure (<code>features/&lt;name&gt;/{screens,components,hooks,api}</code>), aligned with the Frontend co-location rule.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: feature-first folders with <code>presentation</code>/<code>domain</code>/<code>data</code> per feature; avoid one giant <code>lib/</code> of screens.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">One source of truth for shared types; RN shares Zod schemas/types with the backend where the monorepo allows.</span></li>
+        </ul>
+      </section>
+
+      <section id="s02">
+        <div class="sec-head"><span class="num">02</span><h2>State Management</h2></div>
+        <p class="sec-intro">Separate server state from client/UI state.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: TanStack Query owns all server/async state — same rule as Frontend. No <code>useEffect</code> data fetching.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN client/UI state: Zustand (or Context for small trees); avoid Redux unless the client mandates it.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: Riverpod as the default for app/async state; use <code>AsyncValue</code> for the loading/error/data tri-state.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep ephemeral widget state local (<code>useState</code> / <code>StatefulWidget</code>); promote to a store only when shared.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Never store server-cache state in a client store — caching and invalidation belong to the query layer.</span></li>
+        </ul>
+      </section>
+
+      <section id="s03">
+        <div class="sec-head"><span class="num">03</span><h2>Navigation</h2></div>
+        <p class="sec-intro">Typed, declarative, deep-link-ready routing.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: Expo Router (file-based) or React Navigation with a typed param list — no untyped <code>navigate('string')</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: <code>go_router</code> with typed routes; declare deep links centrally.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Define the route tree in one place; screens receive params, never reach into global nav state.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Specify and test deep linking and back-stack behavior per platform (Android hardware back, iOS swipe).</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Guard auth-gated routes at the router layer, not inside each screen.</span></li>
+        </ul>
+      </section>
+
+      <section id="s04">
+        <div class="sec-head"><span class="num">04</span><h2>Networking &amp; Data</h2></div>
+        <p class="sec-intro">Typed client, validated boundaries.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Single typed API client per app; parse responses with Zod (RN) / <code>json_serializable</code> + <code>freezed</code> (Flutter) at the boundary.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Centralize base URL, auth headers, and retry/timeout policy — no per-call fetch config.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: reuse backend contract types; align the error shape with the Backend guide's API conventions.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Handle the offline/timeout case explicitly — surface a typed error, never a silent failure.</span></li>
+        </ul>
+      </section>
+
+      <section id="s05">
+        <div class="sec-head"><span class="num">05</span><h2>Native Modules &amp; Platform APIs</h2></div>
+        <p class="sec-intro">Prefer managed, isolate native.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: prefer Expo modules / config plugins before ejecting to bare native; document any native dependency.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Wrap permissions (camera, location, notifications) behind a single typed abstraction; request lazily, handle denial.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: prefer well-maintained <code>pub.dev</code> plugins; pin versions and audit platform-channel code.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep platform-specific code behind <code>Platform.OS</code> / <code>Platform.isIOS</code> branches in one adapter, not scattered.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Never block the UI thread on native bridge calls.</span></li>
+        </ul>
+      </section>
+
+      <section id="s06">
+        <div class="sec-head"><span class="num">06</span><h2>Performance &amp; List Rendering</h2></div>
+        <p class="sec-intro">Lists and re-renders are the usual culprits.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: use <code>FlashList</code> (or <code>FlatList</code> with <code>keyExtractor</code>, <code>getItemLayout</code>, windowing) for long lists — never <code>.map()</code> in a <code>ScrollView</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: memoize with <code>React.memo</code>/<code>useCallback</code> only at measured hotspots; avoid premature memoization.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: use <code>ListView.builder</code>/slivers for long lists; prefer <code>const</code> constructors everywhere possible.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Defer heavy work off the main thread; profile (Flipper / RN DevTools / Flutter DevTools) before optimizing.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Optimize images: cached, correctly sized, lazy-loaded.</span></li>
+        </ul>
+      </section>
+
+      <section id="s07">
+        <div class="sec-head"><span class="num">07</span><h2>Offline &amp; Local Storage</h2></div>
+        <p class="sec-intro">Choose storage by sensitivity and shape.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use secure storage (Keychain/Keystore) for tokens and secrets — never <code>AsyncStorage</code>/<code>SharedPreferences</code> for credentials.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: MMKV or AsyncStorage for non-sensitive KV; a typed DB (WatermelonDB/SQLite) for relational/offline data.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: <code>flutter_secure_storage</code> for secrets; Drift/Isar/<code>shared_preferences</code> by data shape.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Define an explicit sync/conflict strategy for offline-first features; don't bolt it on later.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Encrypt sensitive at-rest data; clear local caches on logout.</span></li>
+        </ul>
+      </section>
+
+      <section id="s08">
+        <div class="sec-head"><span class="num">08</span><h2>Accessibility</h2></div>
+        <p class="sec-intro">Ship accessible by default, like the web guide.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Label every interactive element (<code>accessibilityLabel</code> / <code>Semantics</code>); icon-only buttons must have labels — mirrors Frontend Quality.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Respect OS settings: dynamic font scaling, reduced motion, dark mode.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Minimum touch target 44×44pt; ensure sufficient contrast against the token palette.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Test with VoiceOver (iOS) and TalkBack (Android) on real flows.</span></li>
+        </ul>
+      </section>
+
+      <section id="s09">
+        <div class="sec-head"><span class="num">09</span><h2>Testing</h2></div>
+        <p class="sec-intro">Same pyramid as the Testing guide, mobile tooling.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Follow the 70/20/10 pyramid — see <code>testing.html</code>. Unit-test view-models/services off-device.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: Jest + React Native Testing Library for components/hooks; Maestro (or Detox) for E2E.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: <code>flutter_test</code> widget tests; <code>integration_test</code> for E2E flows.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Mock the network at the boundary (MSW-style for RN); never hit live backends in unit tests.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use snapshot tests sparingly — assert behavior, not pixel output.</span></li>
+        </ul>
+      </section>
+
+      <section id="s10">
+        <div class="sec-head"><span class="num">10</span><h2>Build, Release &amp; CI</h2></div>
+        <p class="sec-intro">Reproducible builds, aligned with the CI/CD guide.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">RN: EAS Build for reproducible iOS/Android artifacts; OTA updates via EAS Update for JS-only changes.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Flutter: build flavors for dev/staging/prod; produce signed release artifacts in CI, never on a laptop.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Version and code-sign in CI; pull secrets from the CI vault, never commit them — see <code>cicd.html</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Automate store submission (Fastlane / EAS Submit); gate releases on tests + lint passing.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Wire crash/error reporting (Sentry) before the first release — align with Infra observability.</span></li>
+        </ul>
+      </section>
+
+      <p class="no-results" id="no-results">No rules match your filter.</p>
+    </main>
+  </div>
+</div>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (l) l.classList.add('active');
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    let vis = 0;
+    document.querySelectorAll('.rule-item').forEach(item => {
+      const match = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden', !match);
+      if (match) vis++;
+    });
+    document.getElementById('no-results').classList.toggle('visible', vis === 0 && q.length > 0);
+  });
+</script>
+</body>
+</html>

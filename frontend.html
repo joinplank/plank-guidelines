@@ -79,7 +79,7 @@
       <div class="cell"><div class="k">Framework</div><div class="v">Next.js</div></div>
       <div class="cell"><div class="k">UI Library</div><div class="v">Shadcn/ui</div></div>
       <div class="cell"><div class="k">State</div><div class="v accent">TanStack</div></div>
-      <div class="cell"><div class="k">Sections</div><div class="v">4</div></div>
+      <div class="cell"><div class="k">Sections</div><div class="v">10</div></div>
     </div>
     <div class="tag-row">
       <span class="tag">React</span><span class="tag">Next.js</span><span class="tag">Shadcn/ui</span>
@@ -104,6 +104,12 @@
         <li><a href="#s02" class="nav-link"><span class="nav-num">02</span> Data Fetching</a></li>
         <li><a href="#s03" class="nav-link"><span class="nav-num">03</span> Styling</a></li>
         <li><a href="#s04" class="nav-link"><span class="nav-num">04</span> Quality</a></li>
+        <li><a href="#s05" class="nav-link"><span class="nav-num">05</span> Routing</a></li>
+        <li><a href="#s06" class="nav-link"><span class="nav-num">06</span> State Management</a></li>
+        <li><a href="#s07" class="nav-link"><span class="nav-num">07</span> Forms & Validation</a></li>
+        <li><a href="#s08" class="nav-link"><span class="nav-num">08</span> Error & Suspense Boundaries</a></li>
+        <li><a href="#s09" class="nav-link"><span class="nav-num">09</span> Performance</a></li>
+        <li><a href="#s10" class="nav-link"><span class="nav-num">10</span> Project Structure</a></li>
       </ul>
     </aside>
 
@@ -173,6 +179,72 @@
           <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Zod for form validation and API response parsing on the client.</span></li>
           <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Accessibility: semantic HTML, ARIA labels on icon-only buttons, keyboard navigation tested.</span></li>
           <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Bundle analysis before merging large deps — check with Next.js bundle analyzer.</span></li>
+        </ul>
+      </section>
+
+      <section id="s05">
+        <div class="sec-head"><span class="num">05</span><h2>Routing</h2></div>
+        <p class="sec-intro">TanStack Router owns navigation; typed end to end.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">TanStack Router for client routing with fully typed routes, params, and search params — no untyped string paths.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Co-locate route definitions with their feature; loaders fetch via TanStack Query, not ad-hoc effects.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Validate search params with Zod; treat the URL as typed state.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Guard authenticated routes at the router/loader layer, not inside components.</span></li>
+        </ul>
+      </section>
+
+      <section id="s06">
+        <div class="sec-head"><span class="num">06</span><h2>State Management</h2></div>
+        <p class="sec-intro">Server state ≠ client state.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Server state lives in TanStack Query (see Data Fetching). Client/UI state in Zustand or Context — never duplicate server data into a client store.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Keep state as local as possible; lift only when genuinely shared.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Derive, don't store: compute from existing state instead of syncing copies.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">No global mutable singletons; stores are typed and scoped.</span></li>
+        </ul>
+      </section>
+
+      <section id="s07">
+        <div class="sec-head"><span class="num">07</span><h2>Forms & Validation</h2></div>
+        <p class="sec-intro">One schema, reused everywhere.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">React Hook Form for form state; Zod resolver for validation — a single schema shared with the API contract.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Validate on blur/submit, not on every keystroke; surface field-level errors accessibly.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Disable submit while pending; show optimistic or pending UI for mutations.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Never trust client validation alone — the server re-validates (see the Backend guide).</span></li>
+        </ul>
+      </section>
+
+      <section id="s08">
+        <div class="sec-head"><span class="num">08</span><h2>Error & Suspense Boundaries</h2></div>
+        <p class="sec-intro">Failures and loading are first-class UI.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Wrap route segments in error boundaries; render a recoverable fallback, not a white screen.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Use Suspense + TanStack Query <code>useSuspenseQuery</code> for declarative loading states.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Report caught errors to Sentry with feature context — align with Infra observability.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Distinguish expected errors (validation, 404) from unexpected (crash) in the UI.</span></li>
+        </ul>
+      </section>
+
+      <section id="s09">
+        <div class="sec-head"><span class="num">09</span><h2>Performance</h2></div>
+        <p class="sec-intro">Ship less JS, render less often.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Code-split by route; lazy-load heavy/below-the-fold components with <code>dynamic</code> / <code>React.lazy</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Memoize (<code>useMemo</code>/<code>useCallback</code>/<code>React.memo</code>) only at measured hotspots — profile first.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Optimize images with <code>next/image</code>; prefer Server Components to shrink client bundles.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Run the bundle analyzer before merging large dependencies.</span></li>
+        </ul>
+      </section>
+
+      <section id="s10">
+        <div class="sec-head"><span class="num">10</span><h2>Project Structure</h2></div>
+        <p class="sec-intro">Predictable, feature-first layout.</p>
+        <ul class="rules-list">
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Feature-first folders: <code>features/&lt;name&gt;/{components,hooks,api,schemas}</code> — co-locate by feature.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Shared primitives in <code>components/ui</code> (Shadcn); shared logic in <code>lib</code>.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Centralize design tokens in <code>tailwind.config</code> — no scattered magic values.</span></li>
+          <li class="rule-item"><span class="rule-marker">—</span><span class="rule-text">Expose one public surface per feature; avoid deep cross-feature imports.</span></li>
         </ul>
       </section>
 
